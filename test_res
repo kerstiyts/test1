@@ -1,0 +1,54 @@
+*** Settings ***
+Resource          common_resources.txt
+
+*** Variables ***
+${susgEN1}        Jaak    # First name
+${susgPN1}        Aab    # LastName
+${CustomerNumber}    36004096025    # CustomerNumber
+${MAAC1name}      Aab, Jaak    # AccountName
+${susgNUM1}       5148372    # MobileNumber
+${SER1}           EMT Internet    # Service
+${SER1_SPEED1}    Internet telefonis S
+${SER1_SPEED2}    Internet telefonis M
+${SER1_SPEED1_NAME}    1536 MB
+${SER1_SPEED2_NAME}    Internet telefonis M
+${SER1_SPEED1_DESCRIPTION}    Internet telefonis S
+${SER1_SPEED2_DESCRIPTION}    ${EMPTY}
+*** Keywords ***
+Verify Page Minu Teenused
+    [Documentation]    Verifies: Page Minu Teenused
+    Wait Until Page Contains Element    //div[@class='section-header']//h2[contains(text(),'Aktiveeritud teenused')]    ${TIMEOUT}
+    Element Should Contain    //div[@class='section-header']//h2[contains(text(),'Aktiveeritud teenused')]    Aktiveeritud teenused
+    Element Should Contain    //div[@class='right']//span[contains(text(),"EMT Internet")]/../../../h2    Internet
+    Element Should Contain    //div[@class='section-header']//h2[contains(text(),'Tellitavad teenused')]    Tellitavad teenused
+    Verify Sidebar LoggedIn
+    Element Should Contain    //div[@class="section user active"]//div[@class="sidebar-content"]//ul[@class="links"]//a[contains(@href,"minu-teenused") and @class="active"]    Teenused
+
+Select Speed
+    [Arguments]    ${speed}
+    Click Element    //li/span[contains(text(), '${speed}')]
+    Sleep    5
+
+Verify Service Configuration
+    [Arguments]    ${speed}    ${speed_name}    ${speed_description}    ${regexpr_summaryarea}
+    Select Speed    ${speed}
+    #Check title
+    Element Should Contain    //div[@class='titlebar']/div[@class='title']    ${SER1}    #According to testcase description Autotestid7 Step7: Title is expected to be 'Teenuse seadistamine', but it is ${SER1}.
+    #Check sidebar
+    Element Should Contain    //div[@class='modalbox-sidebar']//h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${susgNUM1}\nTeenus:\n${SER1}
+    #Check slider
+    Element Should Contain    //div[@class='ui-slider-title']    Internet (maht/kiirus)\nMaht:\nKiirus:
+    #Check calculator area
+    Page Should Contain Element    //div[@class='calculator-sums']//h2/span[@class='ico']
+    Element Should Contain    //div[@class='calculator-sums']//h2[contains(text(), 'EMT internet telefonis')]    \    # EMT internet telefonis
+    Element Should Contain    //div[@class='calculator-sums']//h2/span[@class='count']    ${speed_name}
+    Element Should Contain    //div[@class='calculator-description']    ${speed_description}
+    #Check summary area
+    Element Should Contain    //div[@class='info']    Hinnad on toodud käibemaksuga
+    ${res1}=    Get Text    //dl[@class='clear']
+    Should Match Regexp    ${res1}    ${regexpr_summaryarea}    # EITHER: "Ühekordne teenustasu:\n 0.00 €\nKuutasu:" \ OR: "Ühekordne teenustasu:\n dd.dd €\nKuutasu:"
+    ${res2}=    Get Text    //dl[@class='clear']/dd[2]
+    Should Match Regexp    ${res2}    \\d+\\.\\d+ €/kuu    #for example: 25.34 €\kuu
+    #Check button
+    Element Should Contain    //div[@class='buttons clear']//span    Kinnita
