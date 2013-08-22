@@ -16,7 +16,7 @@ ${SER1_SPEED1_DESCRIPTION}    Internet telefonis S
 ${SER1_SPEED2_DESCRIPTION}    ${EMPTY}
 *** Keywords ***
 Verify Page Minu Teenused
-    [Documentation]    Verifies: Page Minu Teenused Uus
+    [Documentation]    Verifies: Page Minu Teenused Uus Uus2
     Wait Until Page Contains Element    //div[@class='section-header']//h2[contains(text(),'Aktiveeritud teenused')]    ${TIMEOUT}
     Element Should Contain    //div[@class='section-header']//h2[contains(text(),'Aktiveeritud teenused')]    Aktiveeritud teenused
     Element Should Contain    //div[@class='right']//span[contains(text(),"EMT Internet")]/../../../h2    Internet
