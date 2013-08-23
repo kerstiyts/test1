@@ -1,0 +1,47 @@
+*** Settings ***
+Library           Selenium2Library
+Library           Collections
+Library           String
+
+*** Variables ***
+${TIMEOUT}        60
+
+*** Keywords ***
+Verify Product Page - Detailed view
+    [Arguments]    ${KOOD}    ${COMP}    ${NAME}
+    Wait Until Page Contains Element    //div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]    ${TIMEOUT}
+    Run Keyword And Con tinue On Failure    Element Should Contain    xpath=//div[@id='_eshop_WAR_eshopportletnew_toolheader']/h1    Nutitelefonid    #Header1
+    Page Should Contain Element    xpath=//div[@id="compare"]    \    #Product comparision block
+    Element Should Contain    //div[@class="product-data"]/h2    ${COMP} ${NAME}    #Header2
+    Page Should Contain Element    //div[@class="product-image"]//a/img[contains(@src, '.jpg')]    #Picture as link
+    Page Should Contain    Tootekood: ${KOOD}    #Text: ’Tootekood: KOOD’
+    Page Should Contain Element    //a[@id="_eshop_WAR_eshopportletnew_productAvailabilityLink"]
+    #Check package sales block
+    Page Should Contain Element    //div[@class="product-details clear"]//p[@class="package mobile plus"]/span[@class='icon']    #Icon ’mobiil’
+    Element Should Contain    //div[@class="product-details clear"]//p[@class="package mobile plus"]    Pakett    #Text ’Pakett’
+    ${price}=    Get Text    //div[@class="product-package clear"]/p[@class="price"]
+    Should Match Regexp    ${price}    Toote hind\n.*€    #Toote hind x € (product price)
+    Element Should Contain    //a[@id="_eshop_WAR_eshopportletnew_startPakProcess"][contains(@class, 'button')]    Vali    #Button Vali
+    #Link: Järelmaksu kuumakse: xx.xx € NOT IN PACKAGE SALES BLOCK
+    #Check regular sales block
+    Page Should Contain Element    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]//div[@class='icon mobile']    #Icon ’mobiil’
+    ${res}=    Get Text    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]
+    Should Not Contain    ${res}    Pakett    #NO text ’Pakett’
+    ${price}=    Get Text    //div[@class="product-prices alt clear"]/div[@class="regular clear"]/div[@class="data"]
+    Should Match Regexp    ${price}    Tavahind:.*€    #regular price
+    #${price}=    Get Text    //div[@class="product-prices alt clear"]/p[@class="personal"]
+    #Should Match Regexp    ${price}    EMT kliendile:\n.*€    #price for EMT client
+    Page Should Contain Element    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]//a[@id="_eshop_WAR_eshopportletnew_productLeasingButton1"]    #Osta button
+    ${res}=    Get Text    //div[@class="product-lease"]/p/a
+    Should Match Regexp    ${res}=    Järelmaksu kuumakse:.*€    #Link: Järelmaksu kuumakse: xx.xx €
+    #Check tabs
+    Page Should Contain Element    xpath=//div[@class="tabbed-menu-tabs"]//a[@title='Omadused']    ${TIMEOUT}
+    Page Should Contain Element    xpath=//div[@class="tabbed-menu-tabs"]//a[@title='Seotud tooted']
+    Page Should Contain Element    xpath=//div[@class="tabbed-menu-tabs"]//a[@title='Abiinfo']
+    #Check links
+    Element Should Contain    //div[@class="product-details clear"]//a[@class="compareProduct"]    Võrdle    #Check vordle button
+    Element Should Contain    //div[@class="product-details clear"]//a[@href="Javascript:window.print()"]    Prindi    #Check prindi
+
+Verify Category Page
+
+Verify Shop Front Page

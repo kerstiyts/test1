@@ -1,0 +1,34 @@
+*** Settings ***
+Library           Selenium2Library
+Library           Collections
+Library           String
+
+*** Keywords ***
+Shopping cart - DeliveryBusiness
+
+Shopping cart - DeliveryPrivate
+
+Shopping cart - recipient details
+    [Arguments]    ${susgNUM}    ${maacEN}    ${maacPN}
+    Page Should Contain Element    //div[@id='_shoppingcart_WAR_servicesportlets_deliveryTypeDetails']    # vastuvõtja detailandmed
+    Element Should Contain    //span[@id="clientName"]    ${maacEN} ${maacPN}    #first and las name
+    Page Should Contain Element    //input[@id="contactPhone"]
+    #Page Should Contain Element    //div[@class="form-two-column clear"]//span[@class="field-title"]/text()="Märkused:"    #Textfield name Märkused:
+    Page Should Contain Element    //a[@id="select-deliveryTimes"]    #Kättetoimetamise aeg
+    Sleep    20    #Wait untill dropdown list includes something
+    ${temp}=    Get Element Attribute    //select[@id="deliveryTimes"]//option[2]/.@text
+    Click Link    id=select-deliveryTimes
+    Sleep    1
+    Click Link    ${temp}    #Action: Select first option in Dropdown Menu
+
+Shopping cart - Invoice Address
+
+Shopping cart - Payment Options
+
+Verify shopping cart tabbed menu
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[1]/a
+    Should Match Regexp    ${tab}    Tarnesse saatmine \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[2]/a
+    Should Match Regexp    ${tab}    Kinnitamata tellimused \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[3]/a
+    Should Match Regexp    ${tab}    Pooleliolevad tellimused \\(\\d+\\)

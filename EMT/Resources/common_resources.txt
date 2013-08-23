@@ -1,0 +1,473 @@
+*** Settings ***
+Library           Selenium2Library
+Library           Collections
+Library           String
+
+*** Variables ***
+${FF_User_Profile}    Browsers/FF_Profile/w0q6w891.FF_Profile
+${arendustest}    https://www-test.emt.ee/et
+${prelive}        https://www-prelive.emt.ee/et
+${Test_Environment_URL}    ${prelive}    #www-test.emt.ee
+${homepage}       ${Test_Environment_URL}/avaleht
+${TIMEOUT}        220
+${DB_USERNAME}    tbcis
+${DB_PASSWORD}    medusabcv    #xgsalasona
+${DB_DSN}         tbcisdb2:1521/livebcv
+${NordeaUser}     111111
+${NordeaPass}     9999
+${CA_calc_text}    Kuumakse arvutamisel on aluseks võetud sissemakse 0% ja järelmaksu periood 12 kuud    #disclaimer text for credit agreement sample installments calculations
+
+*** Keywords ***
+Check Sidebar
+    #Check Sidebar
+    Element Should Contain    xpath=//div[@class='sidebar']//div[@class="sidebar-header"]    e-teenindus
+    Element Should Contain    xpath=//div[@class='sidebar']//p[@class="buttons"]    Sisene
+    Element Should Contain    xpath=//div[@class='sidebar']//a[@class="read-more"]    Vaata tutvustust
+
+Verify LogIn Window
+    Wait Until Page Contains Element    //*[@class="modalbox narrow"]/div[@class='titlebar']    ${TIMEOUT}
+    Element Text Should Be    //*[@class="modalbox narrow"]/div[@class='titlebar']    Sisenemine EMT e-teenindusse
+    #Log Source
+    #Page Should Contain Element    //div[@class='modalbox-holder']
+    Element Should Contain    xpath=//div[@class='modalbox narrow']/div[@class='titlebar']    Sisenemine EMT e-teenindusse
+    # Element Text Should Be    //*[@class="modalbox narrow"]//div[@class="form-error"]    Jätkamiseks palun logi sisse e-teenindusse    #restore later. Turned off, cause notification text was added there
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="Mobiil-ID"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="ID-kaart"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="Parool"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="Internetipank"]
+    Click Link    //*[@class="modalbox narrow"]//a[@title="Internetipank"]
+    Element Text Should Be    //*[@class="modalbox narrow"]//div[@id="_authentication_WAR_authenticationportlet_tab-4"]/h2    Sisene internetipanga kaudu
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="swedbank"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="seb"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="nordea"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="ipank"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="sampo"]
+
+LogIn
+    [Arguments]    ${CustomerNumber}    ${FirstName}    ${LastName}    ${MAAC_name}    ${MAAC_ref}
+    Wait Until Page Contains Element    //*[@class="modalbox narrow"]//a[@title="Internetipank"]    ${TIMEOUT}
+    Click Link    //*[@class="modalbox narrow"]//a[@title="Internetipank"]
+    Click Link    //*[@class="modalbox narrow"]//a[@class="sampo"]
+    Wait Until Page Contains Element    ID=ik_code    ${TIMEOUT}
+    Input Text    ID=firstname    ${FirstName}
+    Input Text    ID=lastname    ${LastName}
+    Input Text    ID=ik_code    ${CustomerNumber}
+    Click Button    ID=submit
+    Wait Until Page Contains Element    //div[@id='sitebar']    ${TIMEOUT}
+    ${status}    ${value} =    Run Keyword And Ignore Error    Check User Registration    #check if user's first-time-logon to self-service
+    Run Keyword If    '${status}' == 'PASS'    Existing Login    #continue if previous logon exists
+    Run Keyword Unless    '${status}'=='PASS'    New Login    #register new self-service user
+
+Check User Registration
+    Page Should Contain Element    //div[@id="user"]//a[@class="settings"]
+
+New Login
+    [Documentation]    Registers a new user - needs an unique, dynamically generated email
+    Wait Until Page Contains    EMT e-teeninduse kasutajakonto loomine
+    ${secs} =    Get Time    epoch    #to get unique address
+    Input Text    ID=emailAddress    ${FirstName}_${LastName}_${secs}_autotest@emt.ee
+    Click Element    //div[@class='modalbox-content']//a[@class='button red small']
+    Wait Until Page Contains Element    //div[@id="user"]//a[@class="settings"]    ${TIMEOUT}
+    Run keyword    Existing Login    #user is now registered, continue as with existing
+
+Existing Login
+    [Documentation]    Checks log in successful and deals with MAAC selection
+    Wait Until Page Contains Element    //div[@id="user"]//a[@class="settings"]    ${TIMEOUT}
+    Run Keyword And Continue on Failure    Element Should Contain    ID=user    ${FirstName} ${LastName} Seaded\n Logi välja    #Check successful LogIn
+    Element Text Should Be    //div[@id="user"]//a[@class="settings"]    Seaded
+    Element Text Should Be    //div[@id="user"]//a[@class="button light"]    Logi välja
+    Sleep    5
+    ${MAAC_status_multiple}    ${value} =    Run Keyword And Ignore Error    Check MAAC Selection
+    Run Keyword If    '${MAAC_status_multiple}'=='PASS'    Select MAAC    ${MAAC_name}    ${MAAC_ref}
+    #now should check logged in subscription
+
+Check MAAC Selection
+    [Documentation]    Checks whether or not multiple MAAC selection pop-up appears
+    Wait Until Keyword Succeeds    10 sec    2    Page Should Contain Element    //div[@id="maacTable_filter"]//input
+
+Select MAAC
+    [Arguments]    ${maac_name}    ${maac_ref}
+    [Documentation]    Selects correct MAAC from list by MAAC name and/or reference number
+    Run Keyword Unless    '${maac_name}'=='None'    Filter MAAC    #go to filter by MAAC name if one is given
+    ${radioButtonTemp}=    Get Element Attribute    //input[@value='${maac_ref}']@id    #find the radiobutton by the MAAC ref num
+    Click Element    //label[@for='${radioButtonTemp}']
+    Click Button    //button[@type='submit' and @class='button red small']
+    Wait Until Page Contains Element    //div[@class='section account']/div[@class='sidebar-header']//h2    ${TIMEOUT}
+    Run Keyword Unless    '${maac_name}'=='None'    Element Should Contain    //div[@class='section account']/div[@class='sidebar-header']//h2    ${maac_name}    #check that correct MAAC name is displayed if it exists
+
+Filter MAAC
+    [Documentation]    Filters by MAAC name from list
+    Wait Until Page Contains Element    //div[@id="maacTable_filter"]//input    ${TIMEOUT}
+    Input Text    //div[@id="maacTable_filter"]//input    ${maac_name}
+    Wait Until Page Contains    filteeritud    5
+
+Check Logged In Subscription
+    [Arguments]    ${first_name}    ${last_name}    ${mobile_number}
+    [Documentation]    Checks that correct subscription is the active one
+    ${status_S}    ${value_S} =    Run Keyword And Ignore Error    Check Subscription    #checking user part
+    Run Keyword Unless    '${status_S}'=='PASS'    Switch Subscription    #switching user part if current not correct
+
+Check Subscription
+    [Documentation]    Checks if correct subscription is active by subscription number
+    Run Keyword And Continue On Failure    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2//span    ${mobile_number}
+
+Switch Subscription
+    [Documentation]    Swithes the active subscription to the correct one, by subscription number
+    Click Link    id=_authentication_WAR_authenticationportlet_popup_relationController_showContracts
+    Wait Until Page Contains Element    //div[@id="contractsTable_filter"]//input    ${TIMEOUT}
+    Input Text    //div[@id="contractsTable_filter"]//input    ${mobile_number}
+    Wait Until Page Contains    Kuvatud: 1 kirjet (1-1)    5    #should result in only one match, by number
+    Sleep    5
+    Click Element    //label[contains(@for, 'susgRefNum_0')and contains(@class, 'label-radio')]
+    Click Button    ID=_authentication_WAR_authenticationportlet_chooseContract
+    Wait Until Page Contains Element    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${TIMEOUT}
+    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${first_name}
+    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${last_name}
+    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${mobile_number}
+
+Verify Start Page
+    Title Should Be    Avaleht - EMT
+    Element Text Should Be    xpath=//div[@id='sitebar_buttons']/a[contains(@href, 'pood')]    E-pood
+    Element Text Should Be    xpath=//div[@id='sitebar_buttons']/a[contains(@href, 'mobiili-toolaud')]    E-teenindus
+
+Verify Page Mobiili Toolaud
+    [Arguments]    ${first_name}    ${last_name}    ${account_name}    ${mobile_number}
+    #Check portlets
+    Wait Until Page Contains Element    //div[@id='p_p_id_billinfo_WAR_dashboardportlets_']    20
+    Page Should Contain Element    //div[@id='p_p_id_billinfo_WAR_dashboardportlets_']    #Arveldused portlet
+    Page Should Contain Element    //div[@id='p_p_id_contractssusg_WAR_dashboardportlets_']    #Leping portlet
+    Page Should Contain Element    //div[@id='p_p_id_userinfo_WAR_dashboardportlets_']    #Kliendi andmed portlet
+    Page Should Contain Element    //div[@id='article_id_17701687_header']    #Teenused portlet
+    Page Should Contain Element    //div[@id='p_p_id_mobilesetup_WAR_dashboardportlets_']    # Mobiiltelefoni info portlet
+    Page Should Contain Element    //div[@id='_smssender_WAR_dashboardportlets_simpleContainer']    # SMS saatmine
+    # Check sidebar account section
+    #Element Should Contain    //div[@class='section account']/div[@class='sidebar-header']/h2    ${account_name}
+    Element Should Contain    //div[@class='section account']/div[@class='sidebar-content']//a    Töölaud
+    # Check sidebar active user section
+    Run Keyword And Continue On Failure    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${first_name}
+    Run Keyword And Continue On Failure    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${last_name}
+    #Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//h2    ${mobile_number}
+    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//a[@class='active']    Töölaud
+    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//a[contains(@href, 'minu-teenused')]    Teenused
+    Comment    #Run Keyword And Continue On Failure    Element Should Contain    //div[@class='section user active']/div[@class='sidebar-content']//a[@id='_authentication_WAR_authenticationportlet_popup_relationController_showContracts']    Vaheta mobiilikasutajat
+    # Check shopping cart
+
+Verify Sidebar LoggedIn
+    Wait Until Page Contains Element    xpath=//div[@class="section account"]//div[@class="sidebar-content"]//a    ${TIMEOUT}
+    Element Should Contain    xpath=//div[@class="section account"]//div[@class="sidebar-content"]//a    Töölaud
+    Element Should Contain    //div[@class="section user active"]//div[@class="sidebar-content"]//ul[@class="links"]//a[contains(@href,"mobiili-toolaud")]    Töölaud
+    Element Should Contain    //div[@class="section user active"]//div[@class="sidebar-content"]//ul[@class="links"]//a[contains(@href,"minu-teenused")]    Teenused
+    Element Should Contain    //div[@class="sidebar"]//a[@id="shoppingCartLink"]    Ostukorv
+    #Verify Ostukorv
+    ${ostukorv}=    Get Text    //a[@id="shoppingCartLink"]
+    Should Match Regexp    ${ostukorv}    .*Ostukorv.*\\(\\d+\\).*    #Ostukorv + some number value
+    #Element Should Contain    //a[@id="_authentication_WAR_authenticationportlet_popup_bindingController_back"]/span    Personaalse info vaatamiseks sisesta oma mobiilinumber.
+
+Verify Sidebar LoggedOut
+    #Check Sidebar
+    Element Should Contain    xpath=//div[@class='sidebar']//div[@class="sidebar-header"]    e-teenindus
+    Element Should Contain    xpath=//div[@class='sidebar']//p[@class="buttons"]    Sisene
+    Element Should Contain    xpath=//div[@class='sidebar']//a[@class="read-more"]    Vaata tutvustust
+
+Click Button Jätka
+    # Click button Jätka
+    Click Button    xpath=//button[@class='button red next']
+    #Mouse Over    xpath=//button[@class='button red next']
+    #Mouse Down    xpath=//button[@class='button red next']
+    #Mouse Up    xpath=//button[@class='button red next']
+
+Log Out
+    [Arguments]    ${FirstName}    ${LastName}
+    Click Link    Logi välja
+    Page Should Not Contain    Logi välja
+    Page Should Not Contain    Seaded
+    Page Should Not Contain    ${FirstName} ${LastName}
+
+Reset Subscribers Saldo
+    @{keys}    Get Dictionary Keys    ${userDB}
+    : FOR    ${user}    IN    @{keys}
+    \    ${last_name}=    Get From Dictionary    ${userDB['${user}']}    lastname
+    \    ${first_name}=    Get From Dictionary    ${userDB['${user}']}    firstname
+    \    Set Test Variable    ${user_id}    ${user}
+    \    Click Link    E-teenindus
+    \    Login    ${user_id}    ${first_name}    ${last_name}
+    \    Click Element    xpath=//div[@class='sidebar-content']/p/a[@href='${Test_Environment_URL}/koondarve-toolaud']
+    \    Check Saldo And Pay Unpaid Bills
+    \    Log Out    ${first_name}    ${last_name}
+
+Check Subscribers Saldo
+    [Arguments]    ${CustomerNumber}    ${FirstName}    ${LastName}    ${MAAC_name}    ${MAAC_ref}    ${conn1}
+    [Documentation]    Checks the account balance & pays unpaid bills, always using Chrome
+    Open Browser    ${homepage}    chrome    connPay
+    Click Link    E-teenindus
+    Login    ${CustomerNumber}    ${FirstName}    ${LastName}    ${MAAC_name}    ${MAAC_ref}
+    Click Element    xpath=//div[@class='sidebar-content']/p/a[@href='${Test_Environment_URL}/koondarve-toolaud']
+    Wait Until Page Contains Element    //div[@class="portlet-borderless-container"]//dl[@class="data alt small"][2]//strong[@class="nb"]
+    Check Saldo And Pay Unpaid Bills
+    Log Out    ${FirstName}    ${LastName}
+    Switch Browser    ${conn1}
+
+Check Saldo And Pay Unpaid Bills
+    ${res}=    Check If Unpaid Saldo
+    Run Keyword If    ${res}    Pay Unpaid Bills
+    Click Element    xpath=//div[@class='sidebar-content']/p/a[@href='${Test_Environment_URL}/koondarve-toolaud']
+    ${res}=    Check If Unpaid Saldo
+    Run Keyword If    ${res}    Fail    User ${first_name} is unable to pay bills.
+
+Check If Unpaid Saldo
+    ${price1}=    Get Text    //div[@class="portlet-borderless-container"]//dl[@class="data alt small"][2]//strong[@class="nb"]
+    ${price1}=    Replace String    ${price1}    EUR    ${EMPTY}
+    ${temp}=    Evaluate    int(0)<int(${price1})
+    [Return]    ${temp}
+
+Pay Unpaid Bills
+    Wait Until Page Contains Element    //a[@href="/et/maksmine"]
+    Click Element    //a[@href="/et/maksmine"]
+    Wait Until Page Contains Element    id=_payment_WAR_billportlets_paymentForm_HP    ${TIMEOUT}
+    #${window}=    Get Window Titles
+    #${title}=    Get From List    ${window}    0
+    Click Link    id=_payment_WAR_billportlets_paymentForm_HP
+    #Wait For Active Window    Security Warning
+    #Send    {ENTER}
+    Sleep    10
+    #Send    {TAB}
+    #Send    {ENTER}
+    #Click Element    //table/tbody/tr/td/a[1]
+    Click Link    id=submit
+    Sleep    10
+    Select Window    Maksmine - EMT
+    Wait Until Page Contains    Maksmine    ${TIMEOUT}
+
+Go To E-Services
+    Click Link    E-teenindus
+
+Test Case Setup
+    Delete All Cookies
+    Maximize Browser Window
+
+Test Case Teardown
+    [Documentation]    Closes all browsers if the test was successful
+    Run Keyword If Test Passed    Close All Browsers
+
+Go To Web Shop
+    Click Link    E-pood    #don't wait
+    Wait Until Page Contains Element    //a[text()='Pood']    ${TIMEOUT}
+
+Verify Page E-pood
+    Wait Until Page Contains Element    css=div.banner-content
+    Title Should Be    Pood - EMT
+    # Column One
+    Element Should Contain    //div[@class='product-groups']//div[@class='column one']/h2    Telefonid
+    Element Should Contain    //*[@id="subCat_1004"]/a    Mobiiltelefonid
+    Element Should Contain    //*[@id='subCat_1005']/a    Nutitelefonid
+    Element Should Contain    //*[@id="subCat_1013"]/a    Mobiilitarvikud
+    Element Should Contain    //*[@id="subCat_1016"]/a    Kõnekaardid
+    Page Should Contain Image    //div[@class='column one']//a/img[contains(@src, '.jpg')]
+    # Column two
+    Element Should Contain    //div[@class='product-groups']//div[@class='column two']/h2    Tahvelarvutid / Internet
+    Element Should Contain    //*[@id="subCat_42"]/a    Tahvelarvutid
+    Element Should Contain    //*[@id="subCat_1007"]/a    Tahvelarvutite tarvikud
+    Element Should Contain    //*[@id="subCat_44"]/a    Interneti seadmed
+    Element Should Contain    //*[@id="subCat_2"]/a    Interneti seadmete tarvikud
+    Page Should Contain Image    //div[@class='column two']//a/img[contains(@src, '.jpg')]
+    #Column three
+    Element Should Contain    //div[@class='product-groups']//div[@class='column three']/h2    Arvutid
+    Element Should Contain    //*[@id="subCat_41"]/a    Sülearvutid
+    Element Should Contain    //*[@id="subCat_23"]/a    Lauaarvutid
+    Element Should Contain    //*[@id="subCat_24"]/a    Tarvikud
+    Element Should Contain    //*[@id="subCat_1008"]/a    Tarkvara
+    Page Should Contain Image    //div[@class='column three']//a/img[contains(@src, '.jpg')]
+    #Column four
+    Element Should Contain    //div[@class='product-groups']//div[@class='column four']/h2    Audio- ja videotooted
+    Element Should Contain    //*[@id="subCat_1009"]/a    Televiisorid
+    Element Should Contain    //*[@id="subCat_21"]/a    Fotokaamerad
+    Element Should Contain    //*[@id="subCat_1012"]/a    GPS Seadmed
+    Element Should Contain    //*[@id="subCat_62"]/a    Mängukonsoolid
+    Element Should Contain    //*[@id="subCat_22"]/a    Tarvikud
+    Page Should Contain Image    //div[@class='column four']//a/img[contains(@src, '.jpg')]
+    #Check Image as Link    div[@class='column four']
+    Page Should Contain Link    Hooldus
+    Page Should Contain Link    Teenuste hinnakiri
+    Page Should Contain Link    Tellimistingimused
+
+Verify Sidebar Login Window
+    Wait Until Page Contains Element    //*[@class="modalbox narrow"]/div[@class='titlebar']
+    Element Text Should Be    //*[@class="modalbox narrow"]/div[@class='titlebar']    Sisenemine EMT e-teenindusse
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="Mobiil-ID"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="ID-kaart"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="Parool"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@title="Internetipank"]
+    Click Link    //*[@class="modalbox narrow"]//a[@title="Internetipank"]
+    Element Text Should Be    //*[@class="modalbox narrow"]//div[@id="_authentication_WAR_authenticationportlet_tab-4"]/h2    Sisene internetipanga kaudu
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="swedbank"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="seb"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="nordea"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="ipank"]
+    Page Should Contain Element    //*[@class="modalbox narrow"]//a[@class="sampo"]
+
+Verify Page Nutitelefonid
+    Wait Until Page Contains Element    //h1[text()='Nutitelefonid']    ${TIMEOUT}
+    Sleep    3
+    # Verify Page Nutitelefonid
+    Title Should Be    EMT e-pood - Nutitelefonid
+    # Page Should Contain Link xpath=//a[starts-with(@href,'https://www.emt.ee/ul/eteeninduse_videod/emt_est.html?utm_campaign=&utm_medium=demo&utm_source=emt_est')]
+    #Page Should Contain Element    //div[@class='filter clear']//div[@class='col-2 clear']/h2[text()='Tootja']    #Tootja
+    #Page Should Contain Element    //div[@class='filter clear']//div[@class='col-2 clear']/h2[text()='Hind']    #Hind
+    #Element Text Should Be    css=div.filter.clear div.main.col.clear div.col-1.clear h2    Mobiilse andmeside kiirus
+    #Element Text Should Be    //*[@id="productListFilterForm"]/div[1]/div[1]/div[4]/h2    Kaamera
+    ${res}=    Get Element Attribute    //span[@class='data-keyword']@data-keyword
+    Should Be Equal    ${res}    Vähem omadusi    #Section Rohkem omadusi is closed
+    Element Text Should Be    //span[@class='data-keyword']    Rohkem omadusi
+    # Sorteeri: selection ’Uuemad’ (sort)
+    Wait Until Page Contains Element    //*[@id="_eshop_WAR_eshopportletnew_gridSizeOptions_top"]
+    Element Text Should Be    //a[@id="select-_eshop_WAR_eshopportletnew_sortingOptions_bottom"]    uuemad
+    # Kuva korraga: selected value ’20’ (items per page)
+    Element Text Should Be    //a[@id="select-_eshop_WAR_eshopportletnew_gridSizeOptions_bottom"]    20
+    # Vaade: grid is active by default, list is deactivated by default (grid vs list view)
+    Page Should Contain Element    //div[@class='display-toggle']/a[@class="grid active" and @id="_eshop_WAR_eshopportletnew_displayGrid_top"]
+    Page Should Contain Element    //div[@class='display-toggle']/a[@class="list " and @id="_eshop_WAR_eshopportletnew_displayList_top"]
+    # Products area: Max 20(4cols x 5 rows) products are displayed
+    #Page Should Contain Element    //div[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[@class='products-grid clear]/div[5]/div[4 and @class="grid-item last"]
+    #Page Should Not Contain Element    //div[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[@class='products-grid clear]/div[6]
+    # SEADE1 area: Image as link
+    Page Should Contain Element    //div[@class='product-view']//a/img[contains(@src, '.jpg')]
+    # Title
+    Page Should Contain Element    //div[@class="product-view"]//div[@class="title"]/a
+    ${temp_name}=    Get Text    //div[@class="product-view"]//div[@class="title"]/a
+    #${temp_name}=    Get Text    //div[@class="product-view"]//div[@class="title"]/a/strong
+    # Price: EMT kliendile x € / Tavahind x+y €
+    ${res}=    Get Text    //div[@class="products-grid clear"]/div[1]/div[1]//span[@class="price"]
+    #Should Match Regexp    ${res}    EMT kliendile\n.+€\nTavahind\n.+€
+    ${price1}=    Get Text    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${temp_name}']]//span[@class="sum"]
+    ${price2}=    Get Text    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${temp_name}']]//span[@class='meta']/strong
+    ${price1}=    Replace String    ${price1}    €    ${EMPTY}
+    ${price2}=    Replace String    ${price2}    €    ${EMPTY}
+    ${temp}=    Evaluate    int(${price1})<int(${price2})
+    Should Be True    ${temp}
+    # Title text: COMP1 NAME1
+    Element Should Contain    //div[@class="product-view"]//div[@class="title"]//a[@title='${temp_name}']    ${temp_name}
+    # Button Võrdle / Vaata    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${NAME1}']]//div[@class='controls']
+    ${res}=    Get Text    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${temp_name}']]//div[@class='controls']//a[@id='AddCompareLink']
+    Should Be Equal    ${res}    Võrdle
+    #Element Should Contain    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title=${COMP1} ${NAME1}]]//div[@class='controls']//a[@id='AddCompareLink']    Võrdle    #special character!
+    Element Should Contain    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${temp_name}']]//div[@class='controls']//a[@class='button vaata-button']    Vaata
+
+Check That Order Was Succesfull
+    #Text
+    Wait Until Page Contains Element    //div[@class="message-ok"]/span[contains(text(),"Sinu tellimus on edastatud ja pakk toimetatakse Sulle kulleriga.")]    ${TIMEOUT}
+    #H1
+    Run Keyword And Continue On Failure    Page Should Contain Element    //h1[text()=' Kohaletoimetamine ']
+    #Title
+    Title Should Be    Ostukorv - EMT
+    #Verify tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Sidebar
+    Verify Sidebar LoggedIn
+
+Go To Order History
+    Sleep    1
+    Click Link    id=shoppingCartLink
+    Wait Until Page Contains Element    //div[@id='tab-1']//a[@class='button white small']    ${TIMEOUT}
+    Click Element    //div[@id='tab-1']//a[@class='button white small']
+
+Search For Device
+    [Arguments]    ${company}    ${name}
+    Wait Until Page Contains Element    id=_eshop_WAR_eshopportletnew_filterSearchPattern    ${TIMEOUT}
+    Input Text    id=_eshop_WAR_eshopportletnew_filterSearchPattern    ${name} ${company}    # Search phone
+    Click Button    id=_eshop_WAR_eshopportletnew_refreshButton
+    Sleep    3
+    Wait Until Page Contains Element    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    ${TIMEOUT}
+    Sleep    2
+
+Check That Order Was Succesfull - No tabs
+    #Text
+    Wait Until Page Contains Element    //div[@class="message-ok"]/span[contains(text(),"Sinu tellimus on edastatud ja pakk toimetatakse Sulle kulleriga.")]    ${TIMEOUT}
+    #H1
+    Run Keyword And Continue On Failure    Page Should Contain Element    //h1[text()=' Kohaletoimetamine ']
+    #Title
+    Title Should Be    Ostukorv - EMT
+    #Sidebar
+    Verify Sidebar LoggedIn
+
+Pay Products Via Generic Mock Swedbank
+    Comment    Only works with Chrome (FF throws Sec Warning)
+    Click Link    //a[@class="ico swedbank"]
+    Wait Until Keyword Succeeds    ${TIMEOUT}    3    Select Window    title=Swedbank
+    Wait Until Page Contains Element    id=submit
+    Element Should Contain    //table//table/tbody/tr[4]/td[1]    Saaja arve nr:
+    ${account}=    Get Text    //table//table/tbody/tr[4]/td[2]
+    Click Link    id=submit
+    Wait Until Keyword Succeeds    ${TIMEOUT}    3    Select Window    title=Ostukorv - EMT
+
+Pay Products Via Generic Mock SEB
+    Comment    Only works with Chrome (FF throws Sec Warning)
+    Click Link    //a[@class="ico seb"]
+    ait Until Keyword Succeeds    ${TIMEOUT}    3    Select Window    title=SEB
+    Wait Until Page Contains Element    id=submit
+    Element Should Contain    //table//table/tbody/tr[4]/td[1]    Saaja arve nr:
+    ${account}=    Get Text    //table//table/tbody/tr[4]/td[2]
+    Click Link    id=submit
+    Wait Until Keyword Succeeds    ${TIMEOUT}    3    Select Window    title=Ostukorv - EMT
+
+Pay Products Via Generic Mock Danske
+    Comment    Only works with Chrome (FF throws Sec Warning)
+    Click Link    //a[@class="ico sampo"]
+    Wait Until Keyword Succeeds    ${TIMEOUT}    3    Select Window    title=Sampo pank
+    Wait Until Page Contains Element    id=submit
+    Element Should Contain    //table//table/tbody/tr[4]/td[1]    Saaja arve nr:
+    ${account}=    Get Text    //table//table/tbody/tr[4]/td[2]
+    Click Link    id=submit
+    Wait Until Keyword Succeeds    ${TIMEOUT}    3    Select Window    title=Ostukorv - EMT
+
+Pay Products Via Nordea Mock
+    Click Link    //a[@class="ico nordea"]
+    Wait Until Page Contains Element    btnAcceptUserId
+    Input Text    id=userId    ${NordeaUser}
+    Click Button    btnAcceptUserId
+    Sleep    3
+    Wait Until Page Contains Element    authCode
+    Input Text    id=authCode    ${NordeaPass}
+    Click Button    btnAcceptAuthCode
+    Wait Until Page Contains Element    //table/tbody/tr/td[@class='buttonsright']/input[@value='Soorita']
+    ${account}=    Get Element Attribute    //input[@name='beneficiaryAccount']@value
+    Click Element    //table/tbody/tr/td[@class='buttonsright']/input[@value='Soorita']
+    Wait Until Page Contains Element    //table//td/input[@name='authCode']
+    Input Text    //table//td/input[@name='authCode']    ${NordeaPass}
+    Click Element    //table/tbody/tr/td[@class='buttonsright']/input[@value='Kinnita']
+    Wait Until Keyword Succeeds    2 min    5 sec    Page Should Contain Element    //div[@class='message-ok']
+
+Check Shopping Cart
+    [Arguments]    ${CustomerNumber}    ${FirstName}    ${LastName}    ${MAAC_name}    ${MAAC_ref}    ${conn1}
+    [Documentation]    Checks and removes all existing items from the shopping cart
+    Open Browser    ${homepage}    alias=connCart
+    Click Link    E-teenindus
+    Login    ${CustomerNumber}    ${FirstName}    ${LastName}    ${MAAC_name}    ${MAAC_ref}
+    Click Link    id=shoppingCartLink
+    Wait Until Keyword Succeeds    2 min    5 sec    Page Should Contain Element    //div[@id='_shoppingcart_WAR_servicesportlets_tabs']
+    ${deliveryTab} =    Get Element Attribute    //li[contains(@class, "ui-state-active")]/a@title
+    Run Keyword Unless    '${deliveryTab}' == 'Tarnesse saatmine (0)'    Empty Shopping Cart
+    Log Out    ${first_name}    ${last_name}
+    Switch Browser    ${conn1}
+
+Empty Shopping Cart
+    ${items} =    Get Matching Xpath Count    //table[@class='items products']/tbody/tr
+    Repeat Keyword    ${items}    Remove Product From Shopping Cart
+
+Remove Product From Shopping Cart
+    Click Link    //table[@class='items products']/tbody/tr[1]/td[6]/a[@class='ico-remove']    # Click remove button on row 1
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Wait Until Keyword Succeeds    1 min    5 sec    Click Button    confirmButton
+    Wait Until Page Contains    Valitud tellimus katkestati.    ${TIMEOUT}
+
+Verify Payment Options Modal Window
+    Wait Until Page Contains Element    //h2[text()='Vormista järelmaks']    60
+    Page Should Contain    Osta toode kohe välja
+    ${res}=    Get Text    //p[@class='sum']
+    Should Match Regexp    ${res}    Hind Sinule:.*€
+    Element Should Contain    //p[@class='actions']/a[@class='button']    Osta
+    ${res}=    Get Text    //p[@class='important alt']
+    Should Match Regexp    ${res}    Kuumakse .*€    #kuumakse kuu_xx.xx €
+    Element Should Contain    //p[@class='important alt']//span[@class='meta']    ${CA_calc_text}
+    Element Should Contain    //div[@class="buttons clear"]/a[@class='button closeModal']    Jätka    #Button Jätka

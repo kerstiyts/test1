@@ -1,0 +1,152 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    ff    winTC1
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase1_resources.txt
+Resource          ../Resources/newsubscription_resources.txt
+Library           ../Resources/OracleDB_Library.py
+
+*** Variables ***
+
+*** Test Cases ***
+TestCase1
+    [Documentation]    Test Case 1
+    [Tags]    TestCase1    Ready
+    Find Customer
+    Precheck
+    # Step 1.
+    Verify Start Page
+    # Step 2.
+    Go To E-Services
+    # Step 3 - 5.
+    Log In to E-Services And Verify Page Content
+    # Step 6.
+    Verify That Consolidated Account Dashboard Contains Needed Portlets
+    # Step 7 - 8.
+    Make New Subscription
+    # Step 9.
+    Verify And Select Services
+    # Step 10.
+    Select Package
+    # Step 11 -13.
+    Select Subscription Number
+    # Step 14.
+    Verify And Accept Contract
+    # Step 15.
+    Sign Contract
+    Accept Delivery
+    # Step 16.
+    Verify Shopping Cart Overview And Continue
+    # Step 17 -18.
+    Verify And Select Delivery Address
+    # Step 19-20.
+    Verify Order In Order History
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Find Customer
+    Connect To Database    ${DB_USERNAME}    ${DB_PASSWORD}    ${DB_DSN}
+    ${query_results}=    Query From File    Resources/testcase1_query.txt
+    Disconnect From Database
+    Set Suite Variable    ${MAAC1_ref}    ${query_results[0][0]}
+    Set Suite Variable    ${MAAC1}    ${query_results[0][2]}
+    Set Suite Variable    ${maacEN1}    ${query_results[0][3]}
+    Set Suite Variable    ${maacPN1}    ${query_results[0][4]}
+    Set Suite Variable    ${susgEN1}    ${query_results[0][5]}
+    Set Suite Variable    ${susgPN1}    ${query_results[0][6]}
+    #Set Suite Variable    ${lrEN1}    ${query_results[0][8]}
+    #Set Suite Variable    ${lrPN1}    ${query_results[0][9]}
+    Set Suite Variable    ${IK1}    ${query_results[0][7]}
+    Set Suite Variable    ${susgNUM1}    ${query_results[0][9]}
+
+Precheck
+    Check Subscribers saldo    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC1
+
+Log In to E-Services And Verify Page Content
+    Login    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+    Click Element    xpath=//div[@class='section user active']//div[@class='sidebar-content']//ul//a[@href='${Test_Environment_URL}/mobiili-toolaud']
+    Run Keyword And Continue On Failure    Verify Page Mobiili Toolaud    ${susgEN1}    ${susgPN1}    ${SUSG1}    ${susgNUM1}
+
+Verify That Consolidated Account Dashboard Contains Needed Portlets
+    Click Element    xpath=//div[@class='sidebar-content']/p/a[@href='${Test_Environment_URL}/koondarve-toolaud']
+    Run Keyword And Continue On Failure    Verify Page Consolidated Dashboard    #Check URLs and Variables
+    Comment    TODO: Consolidate MAAC name
+    Comment    TODO: Link Toolaud active
+
+Make New Subscription
+    Click Element    //a/span[contains(text(), 'Uus liitumine')]
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Andmed    #TODO: Verify variables
+    Fill In Page Liitumine - Andmed    ${AutoEN1}    ${AutoPN1}
+
+Verify And Select Services
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Paketid
+    Click Element    xpath=//div[@id="_newcontract_WAR_processportlets_packages"]//a[contains(text(), 'riinternet')]
+    Wait Until Page Contains    Vali    ${TIMEOUT}
+    Click Button    //*[@id="_newcontract_WAR_processportlets_packageButton"]
+
+Select Package
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Interneti paketi valik
+    EMT kodu-äri internet - package config
+    Click Button Jätka
+
+Select Subscription Number
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Numbrivalik
+    Liitumine_Koik vabad numbrid
+    Click Element    //a[text()='Kõik vabad numbrid']/../..//button/span[text()='Jätka']
+
+Verify And Accept Contract
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[@class='active']//span[text()='Leping']    ${TIMEOUT}
+    Sleep    1
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Leping
+    Click Element    //label[contains(@for,'_newcontract_WAR_processportlets_termsForm') and @class="label-check"]
+    Sleep    1
+    Click Element    //a[@id="_newcontract_WAR_processportlets_confirmBtn"]
+    Sleep    2
+    Click Element    //div[@class="confirm"]//button[@id="confirmButton"]
+
+Sign Contract
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[contains(@class,'active')]//span[text()='Allkirjastamine']    ${TIMEOUT}
+    Sleep    6    #Page takes long to load fully
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Allkirjastamine
+    Click Element    //div[@class="content"]//h1
+    Sleep    1
+    Click Element    //fieldset//li[3]/label[contains(@class, "label-radio")]    #Click two times to make sure it is selected
+    Click Element    //fieldset//li[3]/label[contains(@class, "label-radio")]
+    Sleep    2
+    Click Button    //button[@id="_newcontract_WAR_processportlets_signingMethodButton"]
+
+Accept Delivery
+    Wait Until Page Contains    Kohaletoimetamine    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Kohaletoimetamine
+    Sleep    2
+    Click Element    //p/a[@class="button red small"]
+
+Verify Shopping Cart Overview And Continue
+    Wait Until Page Contains    Tarnesse saatmine    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Ulevaade
+    Click Element    //a[@id="_shoppingcart_WAR_servicesportlets_deliverySaveButton"]    #Action: Click Jätka
+    Sleep    1
+    Click Element    //div[@class="confirm"]//button[@id="confirmButton"]    #Action: Click Popup Jah
+
+Verify And Select Delivery Address
+    Wait Until Page Contains    Kohaletoimetamine    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine
+    Click Element    //div[@id="_shoppingcart_WAR_servicesportlets_deliveryTypeDetails"]//tr[1]/td/label[@class='label-radio']    #Action: Select First Radiobutton in Kohaletoimetamine aadress
+    Wait Until Page Contains Element    //div[@class="form-two-column clear"]//a[@class="altselect-trigger"]
+    Sleep    20    # wait for dropdownlist to be populated
+    Click Element    //div[@class="form-two-column clear"]//a[@class="altselect-trigger"]
+    ${temp}=    Get Text    //ul[@class="altselect"]/li[2]/a
+    Click Link    ${temp}    #Action: Select first option in Dropdown Menu
+    Click Element    //a[@id="select-deliveryTimes"]//span[@class="altselect-title"]/strong[contains(text(),'00')][1]
+    Input Text    //textarea[@name="shipNotes"]    Autotest    #Input Text "Autotest" into TextField
+    Click Element    //label[@for="_shoppingcart_WAR_servicesportlets_deliveryTerms" and @class="label-check"]    #Tick CheckBox
+    Click Element    //a[@class="button red small"]/span[contains(text(),"Salvesta")]    #Click Salvesta
+    Wait Until Page Contains Element    //div[@class="tabbed-box-container"]//div[@class="message-ok"]/span[contains(text(),"Sinu tellimus on edastatud ja pakk toimetatakse Sulle kulleriga.")]    ${TIMEOUT}
+    #Step 18. Kohaletoimetamine
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine 2
+
+Verify Order In Order History
+    Go To Order History
+    Run Keyword And Continue On Failure    Verify Order History

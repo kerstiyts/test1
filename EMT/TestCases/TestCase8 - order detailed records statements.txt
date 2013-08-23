@@ -1,0 +1,142 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    ff
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Default Tags
+Test Timeout      10 minutes
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase8_resources.txt    #Library    Screenshot
+
+*** Test Cases ***
+TestCase8
+    [Documentation]    Test Case 8, No new user needed
+    [Tags]    TestCase8    Ready
+    # Step 1
+    Verify Start Page
+    # Step 2 - 4
+    Go To E-Services And Verify Login Window
+    # Step 5
+    Log In to E-Services And Verify Page Content
+    # Step 6
+    Go To Order Statement
+    Verify Page Order Statement
+    # Step 7
+    Fill In Order Statement By Invoice
+    # Step 8
+    Verify Page Statements Ordered
+    # Step 9
+    Fill In Order Statement By Period
+    # Step 10
+    Verify Page Statements Ordered
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Go To E-Services And Verify Login Window
+    Go To E-Services
+    Verify LogIn Window
+
+Log In to E-Services And Verify Page Content
+    Login    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+    Verify Page Mobiili Toolaud    ${susgEN1}    ${susgPN1}    ${SUSG1}    ${susgNUM1}
+
+Go To Order Statement
+    Click Link    //a/span[text()=' Kõne, sõnumite ja interneti eristus ']/..
+    Wait Until Page Contains    Mobiilinumbrid    ${TIMEOUT}
+
+Verify Page Order Statement
+    #Verify tabs
+    Page Should Contain Link    ${link_title_order_KER}
+    Page Should Contain Link    ${link_title_order__KER_history}
+    #Verify headings
+    Page Should Contain Element    //div[@class='section']/h2[text()='Teenuste väljavõte']
+    Page Should Contain Element    //div[@class='section']/h2[text()='Periood']
+    Page Should Contain Element    //div[@class='section']/h2[text()='Mobiilinumbrid']
+    Page Should Contain Element    //div[@class='section']/h2[text()='Telli väljavõte e-postile']
+    Page Should Contain Element    //div[@class='section']/h2[text()='Hinnad']
+    #Verify elements
+    Page Should Contain Element    _ker_WAR_dashboardportlets_kerCall    #Kõned ja sõnumid (checkbox)
+    Page Should Contain Element    _ker_WAR_dashboardportlets_kerData    #Internet (checkbox)
+    Page Should Contain Element    _ker_WAR_dashboardportlets_radio_date    #Ajavahemik (radiobutton)
+    Page Should Contain Element    _ker_WAR_dashboardportlets_fromDate    #From date
+    Page Should Contain Element    _ker_WAR_dashboardportlets_toDate    #To date
+    Page Should Contain Element    _ker_WAR_dashboardportlets_radio_invoice    #Arve alusel (radiobutton)
+    Page Should Contain Element    _ker_WAR_dashboardportlets_invoice    #Invoice list
+    Page Should Contain    Kõnede ja sõnumite väljavõte ühe mobiilinumbri kohta: 0.00 € \ \ Interneti väljavõte ühe mobiilinumbri kohta: 0.00 € \ \ Sinu tasu kokku 0.00 € \ \ \ Kui Sul on tellitud igakuine arve e-posti aadressile, on teenuste väljavõtte tellimine tasuta. Esialgu kajastub väljavõtte tellimise tavahind Sinu jooksva kuu saldos, kuid 24 tunni jooksul arvestatakse see Sinu arvest maha.
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Fill in Order Statement General
+    Click Element    //label[@for='_ker_WAR_dashboardportlets_kerCall']    #Select checkbox Kõned ja sõnumid
+    Click Element    //label[@for='_ker_WAR_dashboardportlets_kerData']    #Select checkbox Internet
+    Click Element    //label[@for='_ker_WAR_dashboardportlets_sendEmail']    #Select checkbox Telli väljavõte e-postile
+    Click Element    //label[@for='_ker_WAR_dashboardportlets_type_html'][1]    #Select radiobutton Vaata internetis
+    Input Text    email    ${email_to}
+    Sleep    1
+    Click Link    //a[@class='button white small']
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Click Button    confirmButton
+    #Verify OK message
+    Wait Until Page Contains Element    //div[@class='message-ok']    ${TIMEOUT}
+    Element Should Contain    //div[@class='message-ok']    ${message_ok}
+
+Fill In Order Statement By Invoice
+    Click Element    //label[@for='_ker_WAR_dashboardportlets_radio_invoice']    #Select radiobutton Arve alusel (last period invoice)
+    Fill in Order Statement General
+
+Fill In Order Statement By Period
+    Click Link    ${link_title_order_KER}
+    Wait Until Page Contains Element    //div[@class='section']/h2[text()='Teenuste väljavõte']
+    Click Element    //label[@for='_ker_WAR_dashboardportlets_radio_date']    #Select radiobutton Ajavahemik    (by period)
+    Fill in Order Statement General
+
+Verify Page Statements Ordered
+    Click Link    ${link_title_order__KER_history}
+    #Verify heading
+    Wait Until Page Contains    ${title_order_KER_history}
+    #Capture Page Screenshot    KER_history
+    #Verify tabs
+    Page Should Contain Link    ${link_title_order_KER}
+    Page Should Contain Link    ${link_title_order_KER_history}
+    Wait Until Keyword Succeeds    ${TIMEOUT}    3    Verify orders table
+
+Verify orders table
+    Page Should Contain Element    _ker_WAR_dashboardportlets_userList
+    ${nr}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    2    1
+    Should Match Regexp    ${nr}    \\d{8}
+    ${period}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    2    2
+    Should Match Regexp    ${period}    \\d{2}\\.\\d{2}\\.\\d{4} - \\d{2}\\.\\d{2}\\.\\d{4}
+    ${ordered}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    2    3
+    Should Match Regexp    ${ordered}=    \\d{2}\\.\\d{2}\\.\\d{4} \\d{2}:\\d{2}:\\d{2}
+    #Wait Until Page Contains Element    //table[@id='_ker_WAR_dashboardportlets_userList']/tbody/tr[1]/td[text()='Teostatud']    120
+    ${status}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    2    5
+    Should Match Regexp    ${status}    Saatmisel|Teostatud|Teostamisel
+    Run Keyword Unless    '${status}' == 'Teostatud'    Recheck Status
+    ${documents}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    2    6
+    Should Match Regexp    ${documents}    CSV | HTML | PDF
+    Page Should Contain Element    _ker_WAR_dashboardportlets_userList
+    ${nr}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    3    1
+    Should Match Regexp    ${nr}    \\d{8}
+    ${period}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    3    2
+    Should Match Regexp    ${period}    \\d{2}\\.\\d{2}\\.\\d{4} - \\d{2}\\.\\d{2}\\.\\d{4}
+    ${ordered}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    3    3
+    Should Match Regexp    ${ordered}=    \\d{2}\\.\\d{2}\\.\\d{4} \\d{2}:\\d{2}:\\d{2}
+    ${status}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    3    5
+    Should Match Regexp    ${status}    Saatmisel|Teostatud|Teostamisel
+    Sleep    5
+    ${documents}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    3    6
+    #Should Match Regexp    ${documents}    CSV formaadis | Vaata internetis | PDF formaadis
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+    #Verify that link Töölaud is active
+    #${class}=    Get Element Attribute    //div[@class="section user active"]//a[contains(@href,"mobiili-toolaud")]@class
+    #Should Be Equal    ${class}    active
+
+Recheck Status
+    Wait Until Keyword Succeeds    2 min    10 sec    Reload Status
+
+Reload Status
+    Sleep    5
+    Reload Page
+    ${status}=    Get Table Cell    _ker_WAR_dashboardportlets_userList    2    5
+    Should Match Regexp    ${status}    Teostatud

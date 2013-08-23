@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generated="20130514 13:02:07.317" generator="Robot 2.7.7 (Python 2.7.3 on win32)">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon" id="s1" name="Falcon">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases" id="s1-s1" name="Falcon testcases">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Credit_Evaluation" id="s1-s1-s1" name="Credit Evaluation">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Credit_Evaluation\Falcon_100.txt" id="s1-s1-s1-s1" name="Falcon 100">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=firefox</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.597" level="INFO">Opening browser 'firefox' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.597" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.597" starttime="20130514 13:02:07.597"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.597" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.629" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.629" starttime="20130514 13:02:07.597"></status>
+</kw>
+<test id="s1-s1-s1-s1-t1" timeout="" name="Falcon_100">
+<doc>1.10. Test: Test Name : Falcon 100. Credit evaluate a customer and ask for more than allowed  in voice. - Neg TC</doc>
+<tags>
+<tag>Falcon_100</tag>
+<tag>Negative</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.629" critical="yes" starttime="20130514 13:02:07.629">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.629" starttime="20130514 13:02:07.348">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Credit_Evaluation\Falcon_101.txt" id="s1-s1-s1-s2" name="Falcon 101">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=firefox</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.644" level="INFO">Opening browser 'firefox' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.644" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.644" starttime="20130514 13:02:07.644"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.644" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.644" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.644" starttime="20130514 13:02:07.644"></status>
+</kw>
+<test id="s1-s1-s1-s2-t1" timeout="" name="Falcon_101">
+<doc>Falcon 101. Credit evaluate a customer and ask for more than allowed in data - Neg TC</doc>
+<tags>
+<tag>Falcon_101</tag>
+<tag>Negative</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.644" critical="yes" starttime="20130514 13:02:07.644">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.644" starttime="20130514 13:02:07.629">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Credit_Evaluation\Falcon_103.txt" id="s1-s1-s1-s3" name="Falcon 103">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=firefox</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.675" level="INFO">Opening browser 'firefox' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.675" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.675" starttime="20130514 13:02:07.675"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.675" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.675" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.675" starttime="20130514 13:02:07.675"></status>
+</kw>
+<test id="s1-s1-s1-s3-t1" timeout="" name="Falcon_103">
+<doc>Credit Evaluation #103 - Credit Evaluate a Customer that has a Credit Limit Under 3000.
+
+Test: Description :
+
+1. Test Objectives
+
+For customers with low score and get joice 52, the credit limit should be printed on the contract
+
+2. Test Entry Criteria´s
+
+Customer has credit limit under 3000.
+
+3. Test Exit Criteria´s
+
+Credit limit shall be visible on the contract.
+
+4. Verification Points
+
+Specify what should be measured and verified in the test.
+
+5. Test Metrics
+
+Find a customer that scores low, joice 52.</doc>
+<tags>
+<tag>Falcon_103</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.675" critical="yes" starttime="20130514 13:02:07.675">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.691" starttime="20130514 13:02:07.644">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.691" starttime="20130514 13:02:07.348"></status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Multi_Order" id="s1-s1-s2" name="Multi Order">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Multi_Order\Falcon_105.txt" id="s1-s1-s2-s1" name="Falcon 105">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.707" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.707" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.707" starttime="20130514 13:02:07.707"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.707" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.707" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.707" starttime="20130514 13:02:07.707"></status>
+</kw>
+<test id="s1-s1-s2-s1-t1" timeout="" name="Falcon_105">
+<doc>Multi Order #105 - Purchase Bundled Voice and Bundled Data Subscription in the Same Order
+
+Test: Description :
+
+1. Test Objectives
+It should be possible to buy a handset bundle with credit agreement and 1 laptop bundle with Credit agreement within the same order
+
+2. Test Entry Criteria´s
+A customer with an existing PBS BAN.
+
+3. Test Exit Criteria´s
+Both items and credit agreement activated in Fokus
+Both new subscription should be added to the existing PBS BAN.
+
+4. Verification Points
+Specify what should be measured and verified in the test.
+
+5. Test Metrics
+Existing customer with PBS BAN that can get 1 more voice subscription + 1 more data subscription both with CA</doc>
+<tags>
+<tag>Falcon_105</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.707" critical="yes" starttime="20130514 13:02:07.707">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.707" starttime="20130514 13:02:07.691">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.722" starttime="20130514 13:02:07.691"></status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\New_Subscription" id="s1-s1-s3" name="New Subscription">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\New_Subscription\Falcon_108.txt" id="s1-s1-s3-s1" name="Falcon 108">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.738" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.738" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.738" starttime="20130514 13:02:07.738"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.738" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.738" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.738" starttime="20130514 13:02:07.738"></status>
+</kw>
+<test id="s1-s1-s3-s1-t1" timeout="" name="Falcon_108">
+<doc>New Subscription #108 - Purchase SIMALONE 4ME Voice Subscription - Existing GIRO BAN
+
+Test: Description :
+
+1. Test Objectives
+
+It should be possible to buy a SIM alone with a configured 4ME (not standard modules) with credit watch and secret number for an existing customer.
+
+2. Test Entry Criteria´s
+
+Customer with existing GIRO BAN
+
+3. Test Exit Criteria´s
+
+1. Subscription shall be added to the existing BAN
+2.  Number can be seen as secret in Copa and Fokus.
+3.  Credit watch can be seen in Copa and Fokus.
+4. Verification Points
+
+Specify what should be measured and verified in the test.
+
+5. Test Metrics
+
+Customer with existing GIRO BAN</doc>
+<tags>
+<tag>Falcon_108</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.738" critical="yes" starttime="20130514 13:02:07.738">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.738" starttime="20130514 13:02:07.722">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.738" starttime="20130514 13:02:07.722"></status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Number_Portability" id="s1-s1-s4" name="Number Portability">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Number_Portability\Falcon_112.txt" id="s1-s1-s4-s1" name="Falcon 112">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.753" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.753" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.753" starttime="20130514 13:02:07.753"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.753" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.753" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.753" starttime="20130514 13:02:07.753"></status>
+</kw>
+<test id="s1-s1-s4-s1-t1" timeout="" name="Falcon_112">
+<doc>Test Name : Falcon 112. Perform a Number porting order with PoA + value added service
+
+Description : 1. Test Objectives
+It should be possible to port in a number with PoA and have a value added service added to the subscription
+
+2. Test Entry Criteria´s
+Describe the pre-requisites of the tests and what conditions must be fullfilled before the test can be executed.
+
+3. Test Exit Criteria´s
+Temporary (midlertidigt) number active in Fokus.
+Value added service added and activated in Fokus.
+
+4. Verification Points
+Specify what should be measured and verified in the test.
+
+5. Test Metrics
+A port in number with donor that does not support ePoA + ICC
+Test data for a customer that can have 1 more subscription
+
+GSM: Any non-TS number
+
+SIM: Find one from Non TS customer here: http://wiki.netcom.no/display/PROJFALCON/Test+Data+for+Test+Environments
+PoA/ePoA Operators: http://produktguiden.tsden.tcad.telia.se/!!%20NY%20PG/Andre%20emner/Nummmerportering/Ekstern%20NP/Operatør%20Oversigt.htm</doc>
+<tags>
+<tag>Falcon_112</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.769" critical="yes" starttime="20130514 13:02:07.753">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.769" starttime="20130514 13:02:07.738">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.769" starttime="20130514 13:02:07.738"></status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Prolong_Subscription" id="s1-s1-s5" name="Prolong Subscription">
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Prolong_Subscription\Falcon_116.txt" id="s1-s1-s5-s1" name="Falcon 116">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.785" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.785" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.785" starttime="20130514 13:02:07.785"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.785" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.785" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.785" starttime="20130514 13:02:07.785"></status>
+</kw>
+<test id="s1-s1-s5-s1-t1" timeout="" name="Falcon_116">
+<doc>Prolong Subscription #116 - Prolong a 4ME Subscription to the Same Priceplan with Same Configurations
+
+Test: Description :
+
+1. Test Objectives
+
+Prolong 4ME subscriber to the same price plan with HW bundle, keep the same module configurations
+
+2. Test Entry Criteria´s
+
+Describe the pre-requisites of the tests and what conditions must be fullfilled before the test can be executed.
+
+3. Test Exit Criteria´s
+
+The MSISDN is activated correct in Fokus with the correct modules
+
+4. Verification Points
+
+Specify what should be measured and verified in the test.
+
+5. Test Metrics
+
+A customer with a 4ME subscription that is prolongable</doc>
+<tags>
+<tag>Falcon_116</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.785" critical="yes" starttime="20130514 13:02:07.785">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.785" starttime="20130514 13:02:07.769">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Prolong_Subscription\Falcon_118.txt" id="s1-s1-s5-s2" name="Falcon 118">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.800" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.800" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.800" starttime="20130514 13:02:07.800"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.800" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.800" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.800" starttime="20130514 13:02:07.800"></status>
+</kw>
+<test id="s1-s1-s5-s2-t1" timeout="" name="Falcon_118">
+<doc>Prolong Subscription #118 -  Prolong a voice subscription to SIMALONE data subscription.
+- Neg TC</doc>
+<tags>
+<tag>Falcon_118</tag>
+<tag>Negative</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.800" critical="yes" starttime="20130514 13:02:07.800">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.800" starttime="20130514 13:02:07.785">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Prolong_Subscription\Falcon_119.txt" id="s1-s1-s5-s3" name="Falcon 119">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.816" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.816" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.816" starttime="20130514 13:02:07.816"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.816" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.816" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.816" starttime="20130514 13:02:07.816"></status>
+</kw>
+<test id="s1-s1-s5-s3-t1" timeout="" name="Falcon_119">
+<doc>Falcon 119 Prolong a data subscription to bundled voice subscription - Neg TC</doc>
+<tags>
+<tag>Falcon_119</tag>
+<tag>Negative</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.816" critical="yes" starttime="20130514 13:02:07.816">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.831" starttime="20130514 13:02:07.816">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<suite source="C:\EMT\emt-eservice-autotest\TS_BSS_TA\Falcon\Falcon_testcases\Prolong_Subscription\Falcon_120.txt" id="s1-s1-s5-s4" name="Falcon 120">
+<kw type="setup" name="Selenium2Library.Open Browser" timeout="">
+<doc>Opens a new browser instance to given URL.</doc>
+<arguments>
+<arg>${TEST_ENVIRONMENT_URL}</arg>
+<arg>browser=ff</arg>
+<arg>ff_profile_dir=${FF_USER_PROFILE}</arg>
+</arguments>
+<msg timestamp="20130514 13:02:07.847" level="INFO">Opening browser 'ff' to base url 'https://at-preview-shop.telia.dk/'</msg>
+<kw type="kw" name="Selenium2Library.Capture Page Screenshot" timeout="">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<arguments>
+</arguments>
+<msg timestamp="20130514 13:02:07.847" level="FAIL">No browser is open</msg>
+<status status="FAIL" endtime="20130514 13:02:07.847" starttime="20130514 13:02:07.847"></status>
+</kw>
+<msg timestamp="20130514 13:02:07.847" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.847" level="FAIL">WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</msg>
+<status status="FAIL" endtime="20130514 13:02:07.847" starttime="20130514 13:02:07.847"></status>
+</kw>
+<test id="s1-s1-s5-s4-t1" timeout="" name="Falcon_120">
+<doc>Test Name : Falcon 120 Prolong subscriber in binding to bundled subscription. - Neg TC, shall fail!
+
+Description : 1. Test Objectives
+It shall not be possible to prolong a data subscription to a voice subscription
+
+2. Test Entry Criteria´s
+Customer has active data subscription
+
+3. Test Exit Criteria´s
+Prolongation shall fail, and Falcon shall give an error text describing why.
+
+4. Verification Points
+Specify what should be measured and verified in the test.
+
+5. Test Metrics
+A customer with a prolongable data subscription</doc>
+<tags>
+<tag>Falcon_120</tag>
+<tag>Negative</tag>
+<tag>Ready</tag>
+</tags>
+<status status="FAIL" endtime="20130514 13:02:07.847" critical="yes" starttime="20130514 13:02:07.847">Setup of the parent suite failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</test>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.847" starttime="20130514 13:02:07.831">Suite setup failed:
+WindowsError: [Error 3] The system cannot find the path specified: u'Global_resources/Browsers/FF_Profile/6tdrb1by.FF_Profile\\*.*'</status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.847" starttime="20130514 13:02:07.769"></status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.847" starttime="20130514 13:02:07.348"></status>
+</suite>
+<doc></doc>
+<metadata>
+</metadata>
+<status status="FAIL" endtime="20130514 13:02:07.847" starttime="20130514 13:02:07.317"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="10" pass="0">Critical Tests</stat>
+<stat fail="10" pass="0">All Tests</stat>
+</total>
+<tag>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_100</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_101</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_103</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_105</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_108</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_112</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_116</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_118</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_119</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="1">Falcon_120</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="5">Negative</stat>
+<stat info="" links="" doc="" combined="" pass="0" fail="10">Ready</stat>
+</tag>
+<suite>
+<stat fail="10" pass="0" id="s1" name="Falcon">Falcon</stat>
+<stat fail="10" pass="0" id="s1-s1" name="Falcon testcases">Falcon.Falcon testcases</stat>
+<stat fail="3" pass="0" id="s1-s1-s1" name="Credit Evaluation">Falcon.Falcon testcases.Credit Evaluation</stat>
+<stat fail="1" pass="0" id="s1-s1-s1-s1" name="Falcon 100">Falcon.Falcon testcases.Credit Evaluation.Falcon 100</stat>
+<stat fail="1" pass="0" id="s1-s1-s1-s2" name="Falcon 101">Falcon.Falcon testcases.Credit Evaluation.Falcon 101</stat>
+<stat fail="1" pass="0" id="s1-s1-s1-s3" name="Falcon 103">Falcon.Falcon testcases.Credit Evaluation.Falcon 103</stat>
+<stat fail="1" pass="0" id="s1-s1-s2" name="Multi Order">Falcon.Falcon testcases.Multi Order</stat>
+<stat fail="1" pass="0" id="s1-s1-s2-s1" name="Falcon 105">Falcon.Falcon testcases.Multi Order.Falcon 105</stat>
+<stat fail="1" pass="0" id="s1-s1-s3" name="New Subscription">Falcon.Falcon testcases.New Subscription</stat>
+<stat fail="1" pass="0" id="s1-s1-s3-s1" name="Falcon 108">Falcon.Falcon testcases.New Subscription.Falcon 108</stat>
+<stat fail="1" pass="0" id="s1-s1-s4" name="Number Portability">Falcon.Falcon testcases.Number Portability</stat>
+<stat fail="1" pass="0" id="s1-s1-s4-s1" name="Falcon 112">Falcon.Falcon testcases.Number Portability.Falcon 112</stat>
+<stat fail="4" pass="0" id="s1-s1-s5" name="Prolong Subscription">Falcon.Falcon testcases.Prolong Subscription</stat>
+<stat fail="1" pass="0" id="s1-s1-s5-s1" name="Falcon 116">Falcon.Falcon testcases.Prolong Subscription.Falcon 116</stat>
+<stat fail="1" pass="0" id="s1-s1-s5-s2" name="Falcon 118">Falcon.Falcon testcases.Prolong Subscription.Falcon 118</stat>
+<stat fail="1" pass="0" id="s1-s1-s5-s3" name="Falcon 119">Falcon.Falcon testcases.Prolong Subscription.Falcon 119</stat>
+<stat fail="1" pass="0" id="s1-s1-s5-s4" name="Falcon 120">Falcon.Falcon testcases.Prolong Subscription.Falcon 120</stat>
+</suite>
+</statistics>
+<errors>
+<msg timestamp="20130514 13:02:07.597" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.644" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.675" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.707" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.738" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.753" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.785" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.800" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.816" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+<msg timestamp="20130514 13:02:07.847" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No browser is open</msg>
+</errors>
+</robot>

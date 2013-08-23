@@ -1,0 +1,302 @@
+*** Settings ***
+Resource          ../Resources/common_resources.txt
+
+*** Variables ***
+${maacEN1}        Kaia
+${maacPN1}        Patune
+${MAAC1_ADDRESS}    \    #First address will be selected and stored here
+${IK1}            48810236019
+${COMP1}          Samsung
+${NAME1}          Galaxy Tab 2 10.1 3G + WiFi
+${KOOD1}          GT-P5100TSASEB    # Product code
+${susgEN1}        KAIA
+${susgPN1}        PATUNE
+${susgNUM1}       53052458
+${Device1}        ${COMP1} ${NAME1}
+${calcText}       Kuumakse arvutamisel on aluseks võetud sissemakse 0% ja järelmaksu periood 12 kuud
+
+*** Keywords ***
+Check Image as Link
+    [Arguments]    ${locator}
+    Page Should Contain Image    xpath=//${locator}//a/img[contains(@src, '.jpg')]
+
+Verify Page Tahvelarvutid
+    # Verify Page Tahvelarvutid
+    Title Should Be    EMT e-pood - Tahvelarvutid
+    Element Should Contain    //div[@id='_eshop_WAR_eshopportletnew_toolheader']/h1    Tahvelarvutid
+    # Page Should Contain Link xpath=//a[text()="Tahvelarvutid"]
+    Element Text Should Be    //*[@id="productListFilterForm"]/div[1]/div[1]/div[1]/h2    Tootja
+    Element Text Should Be    //*[@id="productListFilterForm"]/div[1]/div[1]/div[2]/h2    Hind
+    Element Text Should Be    //*[@id="productListFilterForm"]/div[1]/div[1]/div[3]/h2    Ekraan
+    Element Text Should Be    //*[@id="productListFilterForm"]/div[1]/div[1]/div[4]/h2    Operatsioonisüsteem
+    Element Text Should Be    //*[@id="productListFilterForm"]/div[1]/div[1]/div[5]/h2    Sisemine mälu
+    # Sorteeri: selection ’Uuemad’ (sort)
+    Sleep    6
+    #Element Text Should Be    //*[@id="_eshop_WAR_eshopportletnew_sortingOptions_top"][@class='select-l']    uuemad
+    #Element Text Should Be    //*[@id="select-_eshop_WAR_eshopportletnew_sortingOptions_top"]/span/strong    uuemad
+    # Kuva korraga: selected value ’20’ (items per page)
+    Comment    Element Text Should Be    //*[@id="_eshop_WAR_eshopportletnew_gridSizeOptions_top"]    20
+    List Selection Should Be    //*[@id="_eshop_WAR_eshopportletnew_gridSizeOptions_top"]    20
+    # Vaade: grid is active by default, list is deactivated by default (grid vs list view)
+    Page Should Contain Element    //*[@class="grid active" and @id="_eshop_WAR_eshopportletnew_displayGrid_top"]
+    Page Should Contain Element    //*[@class="list " and @id="_eshop_WAR_eshopportletnew_displayList_top"]
+    # Products area: Max 20(4cols x 5 rows) products are displayed
+    Page Should Contain Element    //*[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[2]/div[5]/div[4 and @class="grid-item last"]
+    Page Should Not Contain Element    //*[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[2]/div[6]
+    # Check with Antti this below line
+    Page Should Contain Element    //*[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[2]/div[5]/div[3 and @class="grid-item last"]
+    # SEADE1 area: Image as link
+    Page Should Contain Element    //div[@class='product-view']//a/img[contains(@src, '.jpg')]
+    # Price: EMT kliendile x € / Tavahind x+y €
+    #Element Should Contain    //*[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[2]/div[1]/div[1]/div/a[2]/div    EMT kliendile
+    #Element Should Contain    //*[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[2]/div[1]/div[1]/div/a[2]/div/span[1]    699 \€
+    #Element Should Contain    //*[@id="_eshop_WAR_eshopportletnew_productsPane"]/div[2]/div[1]/div[1]/div/a[2]/div    Tavahind
+    ${price1}=    Get Text    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${Device1}']]//span[@class="sum"]
+    ${price2}=    Get Text    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${Device1}']]//span[@class='meta']/strong
+    ${price1}=    Replace String    ${price1}    €    ${EMPTY}
+    ${price2}=    Replace String    ${price2}    €    ${EMPTY}
+    ${temp}=    Evaluate    int(${price1})<int(${price2})
+    Should Be True    ${temp}
+    # Button Võrdle / Vaata
+    Element Should Contain    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${Device1}']]//div[@class='controls']//a[@id='AddCompareLink']    Võrdle
+    Element Should Contain    //div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${Device1}']]//div[@class='controls']//a[@class='button vaata-button']    Vaata
+
+Verify Page Vaata Logged In
+    Wait Until Page Contains Element    xpath=//div[@id='_eshop_WAR_eshopportletnew_toolheader']/h1    timeout=120
+    Element Should Contain    xpath=//div[@id='_eshop_WAR_eshopportletnew_toolheader']/h1    Tahvelarvutid    #Header1
+    Page Should Contain Element    xpath=//div[@id="compare"]    \    #Product comparision block
+    Element Should Contain    //div[@class="product-data"]/h2    ${COMP1} ${NAME1}    #Header2
+    Page Should Contain Element    //div[@class="product-image"]//a/img[contains(@src, '.jpg')]    #Picture as link
+    Page Should Contain    Tootekood: ${KOOD1}    #Text: ’Tootekood: KOOD1’
+    Page Should Contain Element    //a[@id="_eshop_WAR_eshopportletnew_productAvailabilityLink"]
+    #Element Should Contain    //a[@id="_eshop_WAR_eshopportletnew_productAvailabilityLink"]    Vaata saadavust    #Link: ’Vaata saadavust’ or 'Vaata saadavust'
+    #Check package sales block
+    Page Should Contain Element    //div[@class="product-details clear"]//p[@class="package tablet plus"]/span[@class='icon']    #Icon ’tablet’
+    Element Should Contain    //div[@class="product-details clear"]//p[@class="package tablet plus"]    Pakett    #Text ’Pakett’
+    ${price}=    Get Text    //div[@class="product-package clear"]/p[@class="price"]
+    Should Match Regexp    ${price}    Toote hind\n.*€    #Toote hind x € (product price)
+    Element Should Contain    //a[@id="_eshop_WAR_eshopportletnew_startPakProcess"][contains(@class, 'button')]    Vali    #Button Vali
+    #Link: Järelmaksu kuumakse: xx.xx € NOT IN PACKAGE SALES BLOCK
+    #Check regular sales block
+    Page Should Contain Element    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]//div[@class='icon tablet']    #Icon ’tablet’
+    ${res}=    Get Text    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]
+    Should Not Contain    ${res}    Pakett    #NO text ’Pakett’
+    ${price}=    Get Text    //div[@class="product-prices alt clear"]/div[@class="regular clear"]/div[@class="data"]
+    Should Match Regexp    ${price}    Tavahind:.*€    #regular price
+    ${price}=    Get Text    //div[@class="product-prices alt clear"]/p[@class="personal"]
+    Should Match Regexp    ${price}    EMT kliendile:\n.*€    #price for EMT client
+    Page Should Contain Element    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]//a[@id="_eshop_WAR_eshopportletnew_productLeasingButton1"]    #Osta button
+    ${res}=    Get Text    //div[@class="product-lease"]/p/a
+    Should Match Regexp    ${res}=    Järelmaksu kuumakse:.*€    #Link: Järelmaksu kuumakse: xx.xx €
+    #Check tabs
+    Page Should Contain Element    xpath=//div[@class="tabbed-menu-tabs"]//a[@title='Omadused']    timeout=120
+    Page Should Contain Element    xpath=//div[@class="tabbed-menu-tabs"]//a[@title='Seotud tooted']
+    Page Should Contain Element    xpath=//div[@class="tabbed-menu-tabs"]//a[@title='Abiinfo']
+    #Check links
+    Element Should Contain    //div[@class="product-details clear"]//a[@class="compareProduct"]    Võrdle    #Check vordle button
+    Element Should Contain    //div[@class="product-details clear"]//a[@href="Javascript:window.print()"]    Prindi    #Check prindi
+    Wait Until Page Contains Element    xpath=//div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]//a[@id="_eshop_WAR_eshopportletnew_mipaCalculatorTrigger"]    timeout=120    #Check MinuEMT
+    Page Should Contain Element    xpath=//div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]//a[@id="_eshop_WAR_eshopportletnew_mipaCalculatorTrigger"]    #Check MinuEMT
+    Comment    Page Should Contain Link    href='#example-leasing-compare'
+    Comment    Page Should Contain    Süle- ja tahvelarvutipakett näidispaketi kuutasu:
+    Comment    ${res}=    Get Text    xpath=//div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]//a[@id="_eshop_WAR_eshopportletnew_mipaCalculatorTrigger"]
+    Comment    Should Be Equal    ${res}    Süle- ja tahvelarvutipakett näidispaketi kuutasu:
+    Element Should Contain    xpath=//div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]//a    Süle- ja tahvelarvutipakett näidispaketi kuutasu:
+    Element Should Contain    xpath=//div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]//a    \€
+    Page Should Contain    Personaalsete hindade nägemiseks logi e-teenindusse sisse
+
+Verify Page Ostukorv
+    [Documentation]    Verifys the shopping cart page.
+    #Wait for the page to load
+    Wait Until Page Contains Element    //div[@class='title']/h1[text()='Ostukorv']    ${TIMEOUT}
+    Comment    Tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    Comment    Text
+    Page Should Contain    Tellimuse kohale toimetamiseks palun tee märge vastava tellimuse juures ning vajuta nuppu "Jätka".
+    Page Should Contain    Kui soovid mitu tellimust ühele aadressile tellida, siis märgi ära kõik need tellimused ning vajuta nuppu "Jätka".
+    Comment    Product details
+    Page Should Contain Element    //table[@class='items']//tr/th/a[contains(text(),'E-poe järelmaks')]    #Column 1: Text "E-poe järelmaks"
+    Element Should Contain    //table[@class='items']//tr/td[1]    ${maacEN1} ${maacPN1}    #Column 2: Active user name
+    Page Should Contain Element    //table[@class='items']//tr/td[2]/a[@class='ico-file ico-pdf']    # Column 3: PDF icon
+    Element Should Contain    //table[@class='items']//tr/td[3]    Allkirjasta    #Column 4: Text "Allkirjasta"
+    Page Should Contain Element    //table[@class='items']//tr/td[4]/label[@class='label-check c-on']    #Column 5: Checkbox
+    Page Should Contain Element    //table[@class='items']//tr/td[5]/a[@class='ico-remove']    #Column 6: Remove icon
+    Comment    Summary
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[1]
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[2]
+    Should Match Regexp    ${res}    Käibemaks 20%:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[3]
+    Should Match Regexp    ${res}    Postikulud:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[4]
+    Should Match Regexp    ${res}    Kokku:\n.+€
+    Comment    Buttons
+    Element Should Contain    //div[@class='buttons']/a[@class='button white small']    Tellimuste ajalugu
+    Element Should Contain    //div[@class='buttons']/a[@class='button white cancel ']    Katkesta
+    Element Should Contain    //div[@class='buttons']/a[@class='button red small']    Jätka
+    Comment    Sidebar
+    Verify Sidebar LoggedIn
+
+Fill In Invalid Amount
+    Click Button    id=_leasing_WAR_eshopportletnew_saveButton    #Jätka
+    Wait Until Page Contains Element    //div[@class="message-error"]/span[contains(text(),"Teie krediidi andmete alusel peab sissemakse olema vähemalt")]    ${TIMEOUT}
+    ${res}=    GetText    //div[@class="message-error"]
+    ${res}=    Replace String    ${res}    Teie krediidi andmete alusel peab sissemakse olema vähemalt    ${EMPTY}
+    ${res}=    Evaluate    float(${res})
+    ${invalid_amount}=    Convert To String    ${res - float(0.01)}
+    Input Text    id=_leasing_WAR_eshopportletnew_downPayment    ${invalid_amount}
+    Click Button    id=_leasing_WAR_eshopportletnew_saveButton    #Jätka
+    #Wait Until Keyword Succeeds    30 sec    2 sec
+    Sleep    10
+    Page Should Contain Element    //div[@class="message-error"]/span[contains(text(),"Teie krediidi andmete alusel peab sissemakse olema vähemalt")]
+    ${res}=    Convert To String    ${res}
+    Input Text    id=_leasing_WAR_eshopportletnew_downPayment    ${res}
+    Click Button    id=_leasing_WAR_eshopportletnew_saveButton    #Jätka
+    #Wait Until Keyword Succeeds    30 sec    2 sec
+    Sleep    10
+    Page Should Not Contain Element    //div[@class="message-error"]
+
+Verify Modal Window Kuumaksu määramine
+    Page Should Contain Element    //a[@id="select-_leasing_WAR_eshopportletnew_leasingPeriods"]    #Järelmaksu periood
+    Page Should Contain Element    //input[@id="_leasing_WAR_eshopportletnew_downPayment"]    #Sissemakse
+    Element Should Contain    //div[@id="_leasing_WAR_eshopportletnew_stepContent"]//div[@class="column-left"]//div[@class="column-field clear"][3]//span[@class="field-content"]    EUR    #Kuumakse:
+    Element Should Contain    //div[@id="_leasing_WAR_eshopportletnew_stepContent"]//div[@class="column-left"]//div[@class="column-field clear"][4]//span[@class="field-content"]    EUR    #Osamaksed kokku
+    Element Should Contain    //div[@id="_leasing_WAR_eshopportletnew_stepContent"]//div[@class="column-right"]//div[@class="column-field clear"][1]//span[@class="field-content"]    %    #Intressimäär
+    Element Should Contain    //div[@id="_leasing_WAR_eshopportletnew_stepContent"]//div[@class="column-right"]//div[@class="column-field clear"][2]//span[@class="field-content"]    EUR    #Intressisumma
+    Element Should Contain    //div[@id="_leasing_WAR_eshopportletnew_stepContent"]//div[@class="column-right"]//div[@class="column-field clear"][3]//span[@class="field-content"]    %    #KKM
+
+Verify Page Ostukorv - Kohaletoimetamine
+    Wait Until Page Contains Element    //div[@class='title']/h1[contains(text(),'Kohaletoimetamine')]    ${TIMEOUT}
+    Comment    Title
+    Title Should Be    Ostukorv - EMT
+    Comment    Tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    Comment    H3 Kohaletoimetamise viis
+    Page Should Contain Element    //h3[contains(text(),'Kohaletoimetamise viis')]
+    Comment    Delivery type radio buttons
+    Page Should Contain Element    //label[@for='_shoppingcart_WAR_servicesportlets_deliveryTypeCourier' and text()='Kuller']
+    Comment    H3 Kohaletoimetamise aadress
+    Page Should Contain Element    //h3[contains(text(),'Kohaletoimetamise aadress')]
+    Comment    Address
+    Page Should Contain Radiobutton    name=selectedAddressRefNum
+    Page Should Contain Link    //a[text()='Määra uus aadress']
+    Comment    H3 Vastuvõtja andmed
+    Page Should Contain Element    //h3[contains(text(),'Vastuvõtja andmed')]
+    Comment    Receiver data fields
+    #${LR_user}=    Get Text    css=div#user
+    #${LR_user}=    Fetch From Left    ${LR_user_temp}    Seaded Logi välja
+    Page Should Contain Element    //input[@id='contactName' and @type='hidden']    #and @value='${LR_user}'
+    #Element Should Contain    //span[@id='clientName']    ${LR_user}
+    Element Should Contain    //input[@id='contactName']/../..    Nimi:*    # and @value='${LR_user}'
+    Page Should Contain Textfield    //input[@id='contactPhone' and @value='${susgNUM1}']
+    Element Should Contain    //input[@id='contactPhone' and @value='${susgNUM1}']/../..    Vastuvõtja telefon:*
+    Page Should Contain Element    //select[@id='deliveryTimes']
+    Element Should Contain    //select[@id='deliveryTimes']/..    Kättetoimetamise aeg:*
+    Page Should Contain Element    //textarea[@id='_shoppingcart_WAR_servicesportlets_shipNotes']
+    Element Should Contain    //textarea[@id='_shoppingcart_WAR_servicesportlets_shipNotes']/../../..    Märkused:
+    Comment    H3 Arve saadetakse
+    Page Should Contain Element    //h3[contains(text(),'Arve saadetakse')]
+    Comment    Invoice data fields
+    Page Should Contain Textfield    //input[@id="nameOnBill" and @value=""]
+    Element Should Contain    //input[@id='nameOnBill']/../..    Nimi arvel:
+    Page Should Contain Textfield    //input[@id="billAddress" and @value=""]
+    Element Should Contain    //input[@id='billAddress']/../..    Arve aadress:
+    Page Should Contain Checkbox    id=_shoppingcart_WAR_servicesportlets_billTypeEmail
+    Element Should Contain    //label[@for='_shoppingcart_WAR_servicesportlets_billTypeEmail'][2]    Soovid arvet e-postile
+    Page Should Contain Textfield    //input[@id='_shoppingcart_WAR_servicesportlets_emailAddress']    # no need for and @value=""] - it may be pre-filled
+    Element Should Contain    //input[@id='_shoppingcart_WAR_servicesportlets_emailAddress']/../..    E-posti aadress:*
+    Page Should Contain Checkbox    id=_shoppingcart_WAR_servicesportlets_billTypePost
+    Element Should Contain    //input[@id='_shoppingcart_WAR_servicesportlets_billTypePost']/../../..    Soovid arvet postiga
+    Comment    Payment radiobuttons
+    Page Should Contain Radiobutton    id=paymentChannel1
+    Page Should Contain Element    //label[@for='paymentChannel1' and text()='Maksa internetipangas']
+    Comment    H1 Tellimistingimused
+    Page Should Contain Element    //h1[text()='Tellimistingimused']
+    Comment    Checkbox
+    Page Should Contain Checkbox    id=_shoppingcart_WAR_servicesportlets_deliveryTerms
+    Page Should Contain Element    //label[@for='_shoppingcart_WAR_servicesportlets_deliveryTerms' and text()='Kinnitan, et tutvusin ja nõustun tingimustega']
+    Comment    Buttons
+    Element Should Contain    //a[@class='button white back']    Tagasi
+    Element Should Contain    //a[@class='button red small']    Salvesta
+    Comment    Summary
+    ${res}=    Get Text    //div[@class='sum clear']
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€\nKäibemaks 20%:\n.+€\nPostikulud:\n.+€\nKokku:\n.+€
+
+Fill In Shipping Options
+    Click Element    //label[@for='_shoppingcart_WAR_servicesportlets_deliveryTypeCourier']    #Select Radio Button    deliveryType    KULLER
+    ${MAAC1_ADDRESS}=    Get Text    //form[@id="_shoppingcart_WAR_servicesportlets_shoppingCartSelectedAddressForm"]//tr[contains(@id, "_shoppingcart_WAR_servicesportlets")][1]//td[4]    #Save selected address
+    Run Keyword    Select Shipping Address
+    Sleep    7
+    ${address_status}    ${value} =    Run Keyword And Ignore Error    Check Shipping Address
+    Run Keyword If    '${address_status}'=='FAIL'    Select Shipping Address
+    Click Element    //div[@class="form-two-column clear"]//a[@id="select-deliveryTimes"]
+    Sleep    3
+    ${temp}=    Get Text    //ul[@class="altselect"]/li[2]/a
+    Click Link    ${temp}    #Action: Select first option in Dropdown Menu
+    Input Text    id=_shoppingcart_WAR_servicesportlets_shipNotes    autotest4    #Notes
+    Input Text    id=nameOnBill    Auto Test    #Name on invoice
+    Input Text    id=billAddress    Auto Test 123, EMT    #Invoice address
+    #Select Checkbox    id=_shoppingcart_WAR_servicesportlets_billTypeEmail    #Email checkbox Is already selected
+    Input Text    id=_shoppingcart_WAR_servicesportlets_emailAddress    autotest_eteenindus@emt.ee
+    Click Element    //label[@for='paymentChannel1']    #Select Radio Button    paymentType    BILL
+    Click Element    //label[@for="_shoppingcart_WAR_servicesportlets_deliveryTerms" and @class="label-check"]    #Checkbox
+    Click Link    //a[@class='button red small']    #Button Salvesta
+
+Check Shipping Address
+    Page Should Contain Element    //form[@id='_shoppingcart_WAR_servicesportlets_shoppingCartSelectedAddressForm']//label[@class='label-radio r-on']
+
+Select Shipping Address
+    Click Element    //form[@id='_shoppingcart_WAR_servicesportlets_shoppingCartSelectedAddressForm']//label[@class='label-radio']
+    Sleep    5
+
+Verify Shopping Cart With Paying Options
+    Wait Until Page Contains    Tasumisele kuulub    ${TIMEOUT}
+    #H1
+    Page Should Contain Element    //h1[text()='Ostukorv']
+    #Title
+    Title Should Be    Ostukorv - EMT
+    #Tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Text
+    ${text}=    Get Text    //div[@class='dashboard-box']
+    Should Match Regexp    ${text}    Tasumisele kuulub:.+EUR\nMaksmiseks palun vali pank.
+    #Internet bank icons
+    Page Should Contain Element    //a[@id='chooseBank_HP' and @class='ico swedbank']
+    Page Should Contain Element    //a[@id='chooseBank_EYP' and @class='ico seb']
+    Page Should Contain Element    //a[@id='chooseBank_KREDIIDIPANK' and @class='ico ipank']
+    Page Should Contain Element    //a[@id='chooseBank_SAMPOPANK' and @class='ico sampo']
+    Page Should Contain Element    //a[@id='chooseBank_NORDEAPANK' and @class='ico nordea']
+    #Veirfy summary
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliveryTab"]//div[@class="sum clear"]/dl[1]
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliveryTab"]//div[@class="sum clear"]/dl[2]
+    Should Match Regexp    ${res}    Käibemaks 20%:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliveryTab"]//div[@class="sum clear"]/dl[3]
+    Should Match Regexp    ${res}    Postikulud:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliveryTab"]//div[@class="sum clear"]/dl[4]
+    Should Match Regexp    ${res}    Kokku:\n.+€
+    #Sidebar
+    Verify Sidebar LoggedIn
+
+Verify Order History
+    #Wait for the page to load
+    Wait Until Page Contains    Tehingu liik    ${TIMEOUT}
+    # Title
+    Page Should Contain Element    //h1[contains(text(), "Tellimuste ajalugu")]
+    #Verify order history
+    ${day}=    Get Time    day
+    ${month}=    Get Time    month
+    ${year}=    Get Time    year
+    ${LR_user}=    Get Text    css=div#user
+    ${LR_user}=    Replace String    ${LR_user}    Seaded Logi välja    ${EMPTY}
+    #${LR_user}=    Replace String    ${LR_user}    Logi    ${EMPTY}
+    #${LR_user}=    Replace String    ${LR_user}    välja    ${EMPTY}
+    #${LR_user}=    Fetch From Left    ${LR_user_temp}    Seaded Logi välja
+    Page Should Contain Element    //tbody/tr[./td[contains(., 'E-poe järelmaks')] and ./td[contains(., '${day}.${month}.${year}')] and ./td[contains(., 'Kohaletoimetamisel')]]    #./td[contains(., '${LR_user}')] and
+    ${order}=    Get Text    //tbody/tr[./td[contains(., 'E-poe järelmaks')] and ./td[contains(., '${day}.${month}.${year}')] and ./td[contains(., 'Kohaletoimetamisel')]]/td[5]    #./td[contains(., '${LR_user}')] and

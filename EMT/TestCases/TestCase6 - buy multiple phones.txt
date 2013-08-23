@@ -1,0 +1,311 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    chrome    winTC6
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Test Timeout      15 minutes
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase6_resources.txt
+
+*** Test Cases ***
+TestCase6
+    [Documentation]    Test Case 6, No new user needed, empty shopping cart
+    [Tags]    TestCase6    Ready
+    Precheck
+    # Step 1
+    Verify Start Page
+    # Step 2
+    Go To Web Shop
+    Log In To Web Shop
+    Verify Web Shop Page When Logged In
+    # Step 3
+    Got To Smartphones Page
+    Select Product 1
+    Select Phone Without Package
+    Add Phone To Shopping Cart
+    Verify Shopping Cart Page With 1 Product
+    # Step 4
+    Go To Web Shop
+    Verify Web Shop Page When Logged In
+    # Step 5
+    Got To Smartphones Page
+    Select Product 2
+    Select Phone Without Package
+    Add Phone To Shopping Cart
+    Verify Shopping Cart Page With 2 Products
+    # Step 6
+    Go To Web Shop
+    Verify Web Shop Page When Logged In
+    # Step 7
+    Got To Smartphones Page
+    Select Product 3
+    Select Phone Without Package
+    Add Phone To Shopping Cart
+    Verify Shopping Cart Page With 3 Products
+    # Step 8
+    Remove Product From Shopping Cart
+    Verify Shopping Cart Page With 2 Products
+    # Step 9
+    Select One Product And Proceed To Shipping Options
+    # Step 10
+    Fill In Shipping Options And Place Order
+    # Step 11 - 12
+    Pay Products
+    # Step 13
+    Check That Order Was Succesfull - No tabs
+    # Step 14
+    Verify Order In Order History
+    # Step 15
+    Remove Remaining Product From Shopping Cart
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Precheck
+    Check Subscribers Saldo    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC6
+    Check Shopping Cart    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC6
+
+Log In To Web Shop
+    Click Link    Sisene
+    Run Keyword And Continue On Failure    Verify Sidebar Login Window
+    Login    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+
+Verify Web Shop Page When Logged In
+    Run Keyword And Continue On Failure    Verify Page E-pood
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Got To Smartphones Page
+    Click Link    Nutitelefonid
+    Run Keyword And Continue On Failure    Verify Page Nutitelefonid
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Select Product 1
+    #${prod}=    Get Text    //div[@class="products-grid clear"]/div[@class="grid-row"][1]/div[@class="grid-item "][1]//div[@class="title"]/a
+    #${NAME1}=    Get Text    //div[@class="products-grid clear"]/div[@class="grid-row"][1]/div[@class="grid-item "][1]//div[@class="title"]/a/strong
+    #${COMP1}=    Replace String    ${prod}    \ ${NAME1}    ${EMPTY}
+    Input Text    id=_eshop_WAR_eshopportletnew_filterSearchPattern    ${NAME1} ${COMP1}
+    Click Button    id=_eshop_WAR_eshopportletnew_refreshButton
+    Sleep    3
+    Wait Until Page Contains Element    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    ${TIMEOUT}
+    Sleep    2
+    Click Link    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    #Click Vaata button
+    Run Keyword And Continue On Failure    Verify Page Vaata Logged In    ${COMP1}    ${NAME1}    ${KOOD1}
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Select Phone Without Package
+    Click Link    _eshop_WAR_eshopportletnew_productLeasingButton1
+    Run Keyword And Continue On Failure    Verify Payment Options Modal Window
+
+Add Phone To Shopping Cart
+    Click Link    //p[@class='actions']/a[@class='button']    #Click button Osta
+
+Verify Shopping Cart Page With 1 Product
+    [Documentation]    Verifys the shopping cart page.
+    #Wait for the page to load
+    Wait Until Page Contains Element    //div[@class='title']/h1[text()='Ostukorv']    60
+    #Verify tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Verify text
+    #Page Should Contain    Tellimuse kohale toimetamiseks palun tee märge vastava tellimuse juures ning vajuta nuppu "Jätka".
+    #Page Should Contain    Kui soovid mitu tellimust ühele aadressile tellida, siis märgi ära kõik need tellimused ning vajuta nuppu "Jätka".
+    #Verify table with product details
+    Page Should Contain Image    //table[@class='items products']//tr/th//div[@class='image']/img[contains(@src, '.jpg')]    #Product image in col 1
+    Element Should Contain    //table[@class='items products']//tr/th//div[@class='meta']    ${COMP1} ${NAME1}    #Column 1: Product name
+    ${res}=    Get Text    //table[@class='items products']//tr/td[1]/dl
+    Should Match Regexp    ${res}    KM-ta hind:\n.+€    #Column 2: KM-ta hind: xx.xx €
+    ${res}=    Get Text    //table[@class='items products']//tr/td[2]/dl
+    Should Match Regexp    ${res}    Hind:\n.+€    #Column 3: Hind: xx.xx € \
+    ${res}=    Get Text    //table[@class='items products']//tr/td[3]
+    Should Match Regexp    ${res}    1    #Column 4: Amount
+    ${res}=    Get Text    //table[@class='items products']//tr/td[4]/dl
+    Should Match Regexp    ${res}    Hind kokku:\n.+€    #Column 5: Total price
+    Page Should Contain Element    //table[@class='items products']//tr/td[5]/label[contains(@class, 'label-check')]    #Column 6: Checkbox
+    Page Should Contain Element    //table[@class='items products']//tr/td[6]/a[@class='ico-remove']    #Column 7: Remove icon
+    #Veirfy summary
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[1]
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[2]
+    Should Match Regexp    ${res}    Käibemaks 20%:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[3]
+    Should Match Regexp    ${res}    Postikulud:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[4]
+    Should Match Regexp    ${res}    Kokku:\n.+€
+    #Verify buttons
+    Element Should Contain    //div[@class='buttons']/a[@class='button white small']    Tellimuste ajalugu
+    Element Should Contain    //div[@class='buttons']/a[@class='button white cancel ']    Katkesta
+    Element Should Contain    //div[@class='buttons']/a[@class='button red small']    Jätka
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Select Product 2
+    #${prod}=    Get Text    //div[@class="products-grid clear"]/div[@class="grid-row"][2]/div[@class="grid-item "][2]//div[@class="title"]/a
+    #${NAME2}=    Get Text    //div[@class="products-grid clear"]/div[@class="grid-row"][2]/div[@class="grid-item "][2]//div[@class="title"]/a/strong
+    #${COMP2}=    Replace String    ${prod}    \ ${NAME2}    ${EMPTY}
+    Input Text    id=_eshop_WAR_eshopportletnew_filterSearchPattern    ${NAME2} ${COMP2}
+    Click Button    id=_eshop_WAR_eshopportletnew_refreshButton
+    Wait Until Page Contains Element    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP2} ${NAME2}']]//a[@class='button vaata-button']    ${TIMEOUT}
+    Click Link    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP2} ${NAME2}']]//a[@class='button vaata-button']    #Click Vaata button
+    Run Keyword And Continue On Failure    Verify Page Vaata Logged In    ${COMP2}    ${NAME2}    ${KOOD2}
+    Verify Sidebar LoggedIn
+
+Verify Shopping Cart Page With 2 Products
+    [Documentation]    Verifys the shopping cart page.
+    #Wait for the page to load
+    Wait Until Page Contains Element    //div[@class='title']/h1[text()='Ostukorv']    ${TIMEOUT}
+    #Verify tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Verify text
+    #Page Should Contain    Tellimuse kohale toimetamiseks palun tee märge vastava tellimuse juures ning vajuta nuppu "Saada tarnesse".
+    #Page Should Contain    Kui soovid mitu tellimust ühele aadressile tellida, siis märgi ära kõik need tellimused ning vajuta nuppu "Saada tarnesse".
+    #Verify table with product details: row 1
+    Page Should Contain Image    //table[@class='items products']/tbody/tr[1]/th//div[@class='image']/img[contains(@src, '.jpg')]    #Product image in col 1
+    Element Should Contain    //table[@class='items products']/tbody/tr[1]/th//div[@class='meta']    ${COMP2} ${NAME2}    #Column 1: Product name
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[1]/dl
+    Should Match Regexp    ${res}    KM-ta hind:\n.+€    #Column 2: KM-ta hind: xx.xx €
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[2]/dl
+    Should Match Regexp    ${res}    Hind:\n.+€    #Column 3: Hind: xx.xx € \
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[3]
+    Should Match Regexp    ${res}    1    #Column 4: Amount
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[4]/dl
+    Should Match Regexp    ${res}    Hind kokku:\n.+€    #Column 5: Total price
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[1]/td[5]/label[contains(@class, 'label-check')]    #Column 6: Checkbox
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[1]/td[6]/a[@class='ico-remove']    #Column 7: Remove icon
+    #Verify table with product details: row 2
+    Page Should Contain Image    //table[@class='items products']/tbody/tr[2]/th//div[@class='image']/img[contains(@src, '.jpg')]    #Product image in col 1
+    Element Should Contain    //table[@class='items products']/tbody/tr[2]/th//div[@class='meta']    ${COMP1} ${NAME1}    #Column 1: Product name
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[1]/dl
+    Should Match Regexp    ${res}    KM-ta hind:\n.+€    #Column 2: KM-ta hind: xx.xx €
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[2]/dl
+    Should Match Regexp    ${res}    Hind:\n.+€    #Column 3: Hind: xx.xx € \
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[3]
+    Should Match Regexp    ${res}    1    #Column 4: Amount
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[4]/dl
+    Should Match Regexp    ${res}    Hind kokku:\n.+€    #Column 5: Total price
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[2]/td[5]/label[contains(@class, 'label-check')]    #Column 6: Checkbox
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[2]/td[6]/a[@class='ico-remove']    #Column 7: Remove icon
+    #Veirfy summary
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[1]
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[2]
+    Should Match Regexp    ${res}    Käibemaks 20%:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[3]
+    Should Match Regexp    ${res}    Postikulud:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[4]
+    Should Match Regexp    ${res}    Kokku:\n.+€
+    #Verify buttons
+    Element Should Contain    //div[@class='buttons']/a[@class='button white small']    Tellimuste ajalugu
+    Element Should Contain    //div[@class='buttons']/a[@class='button white cancel ']    Katkesta
+    Element Should Contain    //div[@class='buttons']/a[@class='button red small']    Jätka
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Select Product 3
+    #${prod}=    Get Text    //div[@class="products-grid clear"]/div[@class="grid-row"][3]/div[@class="grid-item "][3]//div[@class="title"]/a
+    #${NAME3}=    Get Text    //div[@class="products-grid clear"]/div[@class="grid-row"][3]/div[@class="grid-item "][3]//div[@class="title"]/a/strong
+    #${COMP3}=    Replace String    ${prod}    \ ${NAME3}    ${EMPTY}
+    Input Text    id=_eshop_WAR_eshopportletnew_filterSearchPattern    ${NAME3} ${COMP3}
+    Click Button    id=_eshop_WAR_eshopportletnew_refreshButton
+    Wait Until Page Contains Element    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP3} ${NAME3}']]//a[@class='button vaata-button']    ${TIMEOUT}
+    Click Link    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP3} ${NAME3}']]//a[@class='button vaata-button']    #Click Vaata button
+    Run Keyword And Continue On Failure    Verify Page Vaata Logged In    ${COMP3}    ${NAME3}    ${KOOD3}
+    Verify Sidebar LoggedIn
+
+Verify Shopping Cart Page With 3 Products
+    [Documentation]    Verifys the shopping cart page.
+    #Wait for the page to load
+    Wait Until Page Contains Element    //div[@class='title']/h1[text()='Ostukorv']    60
+    #Verify tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Verify text
+    #Page Should Contain    Tellimuse kohale toimetamiseks palun tee märge vastava tellimuse juures ning vajuta nuppu "Saada tarnesse".
+    #Page Should Contain    Kui soovid mitu tellimust ühele aadressile tellida, siis märgi ära kõik need tellimused ning vajuta nuppu "Saada tarnesse".
+    #Verify table with product details: row 1
+    Page Should Contain Image    //table[@class='items products']/tbody/tr[1]/th//div[@class='image']/img[contains(@src, '.jpg')]    #Product image in col 1
+    Element Should Contain    //table[@class='items products']/tbody/tr[1]/th//div[@class='meta']    ${COMP3} ${NAME3}    #Column 1: Product name
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[1]/dl
+    Should Match Regexp    ${res}    KM-ta hind:\n.+€    #Column 2: KM-ta hind: xx.xx €
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[2]/dl
+    Should Match Regexp    ${res}    Hind:\n.+€    #Column 3: Hind: xx.xx € \
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[3]
+    Should Match Regexp    ${res}    1    #Column 4: Amount
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[1]/td[4]/dl
+    Should Match Regexp    ${res}    Hind kokku:\n.+€    #Column 5: Total price
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[1]/td[5]/label[contains(@class, 'label-check')]    #Column 6: Checkbox
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[1]/td[6]/a[@class='ico-remove']    #Column 7: Remove icon
+    #Verify table with product details: row 2
+    Page Should Contain Image    //table[@class='items products']/tbody/tr[2]/th//div[@class='image']/img[contains(@src, '.jpg')]    #Product image in col 1
+    Element Should Contain    //table[@class='items products']/tbody/tr[2]/th//div[@class='meta']    ${COMP2} ${NAME2}    #Column 1: Product name
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[1]/dl
+    Should Match Regexp    ${res}    KM-ta hind:\n.+€    #Column 2: KM-ta hind: xx.xx €
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[2]/dl
+    Should Match Regexp    ${res}    Hind:\n.+€    #Column 3: Hind: xx.xx € \
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[3]
+    Should Match Regexp    ${res}    1    #Column 4: Amount
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[2]/td[4]/dl
+    Should Match Regexp    ${res}    Hind kokku:\n.+€    #Column 5: Total price
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[2]/td[5]/label[contains(@class, 'label-check')]    #Column 6: Checkbox
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[2]/td[6]/a[@class='ico-remove']    #Column 7: Remove icon
+    #Verify table with product details: row 3
+    Page Should Contain Image    //table[@class='items products']/tbody/tr[3]/th//div[@class='image']/img[contains(@src, '.jpg')]    #Product image in col 1
+    Element Should Contain    //table[@class='items products']/tbody/tr[3]/th//div[@class='meta']    ${COMP1} ${NAME1}    #Column 1: Product name
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[3]/td[1]/dl
+    Should Match Regexp    ${res}    KM-ta hind:\n.+€    #Column 2: KM-ta hind: xx.xx €
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[3]/td[2]/dl
+    Should Match Regexp    ${res}    Hind:\n.+€    #Column 3: Hind: xx.xx € \
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[3]/td[3]
+    Should Match Regexp    ${res}    1    #Column 4: Amount
+    ${res}=    Get Text    //table[@class='items products']/tbody/tr[3]/td[4]/dl
+    Should Match Regexp    ${res}    Hind kokku:\n.+€    #Column 5: Total price
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[3]/td[5]/label[contains(@class, 'label-check')]    #Column 6: Checkbox
+    Page Should Contain Element    //table[@class='items products']/tbody/tr[3]/td[6]/a[@class='ico-remove']    #Column 7: Remove icon
+    #Veirfy summary
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[1]
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[2]
+    Should Match Regexp    ${res}    Käibemaks 20%:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[3]
+    Should Match Regexp    ${res}    Postikulud:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[4]
+    Should Match Regexp    ${res}    Kokku:\n.+€
+    #Verify buttons
+    Element Should Contain    //div[@class='buttons']/a[@class='button white small']    Tellimuste ajalugu
+    Element Should Contain    //div[@class='buttons']/a[@class='button white cancel ']    Katkesta
+    Element Should Contain    //div[@class='buttons']/a[@class='button red small']    Jätka
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Remove Product From Shopping Cart
+    Click Link    //table[@class='items products']/tbody/tr[1]/td[6]/a[@class='ico-remove']    # Click remove button on row 1
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Wait Until Keyword Succeeds    1 min    5 sec    Click Button    confirmButton
+    Wait Until Page Contains    Valitud tellimus katkestati.    ${TIMEOUT}
+
+Select One Product And Proceed To Shipping Options
+    Click Element    //table[@class='items products']/tbody/tr[1]/td[5]/label[@class='label-check']    #Tick checkbox on product 2 (row 1)
+    Click Link    //div[@class='buttons']/a[@class='button red small']    #Click Button Jätka
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Sleep    3
+    Click Button    confirmButton    #Click button Jah
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine
+
+Fill In Shipping Options And Place Order
+    Fill In Shipping Options
+    Run Keyword And Continue On Failure    Verify Shopping Cart With Paying Options
+
+Pay Products
+    #Pay Products Via Nordea Mock
+    Pay Products Via Generic Mock Swedbank    #works with Chrome
+
+Verify Order In Order History
+    Go To Order History
+    Run Keyword And Continue On Failure    Verify Order History
+
+Remove Remaining Product From Shopping Cart
+    Click Link    id=shoppingCartLink
+    Wait Until Page Contains Element    //table[@class='items products']/tbody/tr[1]/td[6]/a[@class='ico-remove']
+    Remove Product From Shopping Cart

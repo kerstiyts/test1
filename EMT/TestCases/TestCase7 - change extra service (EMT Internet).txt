@@ -1,0 +1,152 @@
+*** Settings ***
+Documentation     TestCase7
+Suite Setup       Open Browser    ${homepage}    chrome    winTC7
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Default Tags
+Test Timeout      10 minutes
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase7_resources.txt
+
+*** Variables ***
+
+*** Test Cases ***
+TestCase7
+    [Documentation]    Test Case 7, no new user needed
+    [Tags]    TestCase7    Ready
+    Precheck
+    # Step 1
+    Verify the Start Page
+    # Step 2 - 3
+    Go To E-Services
+    Verify the LogIn Window
+    # Step 4 - 5
+    Log In to E-Services And Verify Page Content
+    # Step 6
+    Go To Services Page And Verify Page Content
+    # Step 7
+    Go To Service Configuration Of Activated Service
+    Verify Service Configuration Page - Speed1
+    # Step 8
+    Verify Service Configuration Page - Speed2
+    Select Different Speed Than What Is Active
+    # Step 9
+    Confirm Changed Configuration
+    # Step 10
+    Button Close And Return And Verify Services Page Content
+    # Step 11
+    Verify Order In Order History
+    # Step 12
+    Go To Services Page And Verify Page Content
+    # Step 13
+    Confirm That Can't Change Configuration Again
+    # Step 14
+    Icon Close And Return And Verify Services Page Content
+    # Step 15
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Precheck
+    Check Subscribers saldo    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC7
+
+Verify the Start Page
+    Reload Page
+    Run Keyword And Continue On Failure    Verify Start Page
+
+Verify the LogIn Window
+    Run Keyword And Continue On Failure    Verify LogIn Window
+
+Log In to E-Services And Verify Page Content
+    LogIn    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+    Run Keyword And Continue On Failure    Verify Page Mobiili Toolaud    ${susgEN1}    ${susgPN1}    ${MAAC1}    ${susgNUM1}
+
+Go To Service Configuration Of Activated Service
+    Click Link    //div[@class='right']//div[@class='selection clear active']//span[text()="EMT Internet"]/../..//a
+    #Check for pop up window
+    Wait Until Page Contains    Internet/kuutasuta    ${TIMEOUT}
+
+Verify Service Configuration Page - Speed1
+    ${ActiveSpeed}=    Get Text    //ul[@class='steps clear']//li[contains(@class, 'active')]
+    Set Test Variable    ${ActiveSpeed}
+    ${RegExprSumArea}=    Set Variable If    '${ActiveSpeed}' == '${SER1_SPEED1}'    Ühekordne teenustasu:\n 0.00 €\nKuutasu:    Ühekordne teenustasu:\n \\d+\\.\\d+ €\nKuutasu:
+    Set Test Variable    ${RegExprSumArea}
+    Run Keyword And Continue On Failure    Verify Service Configuration    ${SER1_SPEED1}    ${SER1_SPEED1_NAME}    ${SER1_SPEED1_DESCRIPTION}    ${RegExprSumArea}
+
+Verify Service Configuration Page - Speed2
+    Run Keyword And Continue On Failure    Verify Service Configuration    ${SER1_SPEED2}    ${SER1_SPEED2_NAME}    ${SER1_SPEED2_DESCRIPTION}    Ühekordne teenustasu:\n 0.00 €\nKuutasu:
+
+Select Different Speed Than What Is Active
+    # Verifications (Autotestid 7: steps 7 and 8) are done according to Word documentation. \ \ Different from documentation in Step 8: from the slider is not selected always the last position, but the position that is currently not selected, that is either the last position or 'EMT Internet telefonis S'.
+    ${new_speed}=    Set Variable If    '${ActiveSpeed}' == '${SER1_SPEED2}'    ${SER1_SPEED1}    ${SER1_SPEED2}
+    Select Speed    ${new_speed}
+
+Confirm Changed Configuration
+    Click Element    //a[@id='_standardserviceportlet_WAR_servicesportlets_confirmSaveAction']
+    Wait Until Page Contains Element    //div[@class='buttons']//button[@class='button white pass']    ${TIMEOUT}    #Button Kinnita
+    Wait Until Keyword Succeeds    2 min    5 sec    Click Button    //div[@class='buttons']//button[@class='button white pass']
+    Wait Until Page Contains Element    //a[@class='button white small close']    ${TIMEOUT}    #Button Jah
+    Wait Until Page Contains    Sulge
+    Run Keyword And Continue On Failure    Verify Changed Configuration
+
+Verify Changed Configuration
+    Element Should Contain    //div[@class='modalbox-holder']//div[@class='title']    EMT Internet    #Autotestid7 Step9: Title expected to be 'Teenuse seadistamine', but it is 'EMT Internet'.
+    Element Should Contain    //div[@class='modalbox-sidebar']//h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='modalbox-wrapper clear']//h1    Täname
+    Element Should Contain    //div[@class='modalbox-wrapper clear']//div[@class='form-error']    Teenuse tellimus on teostatud.
+    Element Should Contain    //div[@class='buttons']/a[@class='button white small close']    Sulge
+
+Verify Order History
+    #Wait for the page to load
+    Wait Until Page Contains    Tehingu liik    60
+    #Verify order history
+    ${day}=    Get Time    day
+    ${month}=    Get Time    month
+    ${year}=    Get Time    year
+    Page Should Contain    Tellimuste ajalugu
+    #Verify order history
+    ${table_rows}=    Get Matching Xpath Count    //table[contains(@id, '_shoppingcarthistory_')]//tr
+    ${last_row}=    Evaluate    ${table_rows}-1
+    Element Should Contain    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${last_row}]/td[1]    Teenuse seadistamine
+    Element Should Contain    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${last_row}]/td[2]    ${susgNUM1}/${susgEN1} ${susgPN1}
+    Element Should Contain    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${last_row}]/td[3]    ${day}.${month}.${year}
+    ${status}=    Get Text    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${last_row}]/td[4]
+    ${order}=    Get Text    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${last_row}]/td[5]
+    Should Match Regexp    ${status}    Suunatud teostamisse|Teostamisel|Teostatud
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Verify Order In Order History
+    Go To    ${Test_Environment_URL}/tellimuste-ajalugu
+    Run Keyword And Continue On Failure    Verify Order History
+
+Confirm That Can't Change Configuration Again
+    Click Link    //div[@class='right']//span[text()="EMT Internet"]/../..//a    #Click Seadista
+    Wait Until Page Contains Element    //div[contains(@class, 'modalbox')]//div[@class='close']    ${TIMEOUT}
+    ${title}=    Get Text    //div[@class='titlebar']/div[@class='title']
+    Run Keyword If    '${title}' == 'Teenuse seadistamine'    Verify That Can't Change Configuration Again
+    #Run Keyword And Continue On Failure    Verify That Can't Change Configuration Again
+
+Verify That Can't Change Configuration Again
+    Element Should Contain    //div[@class='message-ok box']    Teenuse seadistamine on teostamisel.
+
+Verify Page Minu Teenused
+    [Documentation]    Verifies: Page Minu Teenused
+    Wait Until Page Contains Element    //div[@class='section-header']//h2[contains(text(),'Aktiveeritud teenused')]    ${TIMEOUT}
+    Element Should Contain    //div[@class='section-header']//h2[contains(text(),'Aktiveeritud teenused')]    Aktiveeritud teenused
+    Element Should Contain    //div[@class='right']//span[contains(text(),"EMT Internet")]/../../../h2    Internet
+    Element Should Contain    //div[@class='section-header']//h2[contains(text(),'Tellitavad teenused')]    Tellitavad teenused
+    Verify Sidebar LoggedIn
+    Element Should Contain    //div[@class="section user active"]//div[@class="sidebar-content"]//ul[@class="links"]//a[contains(@href,"minu-teenused") and @class="active"]    Teenused
+
+Go To Services Page And Verify Page Content
+    Click Element    //div[@class='sidebar']//a/span[contains(text(), 'Teenused')]
+    Run Keyword And Continue On Failure    Verify Page Minu Teenused
+
+Button Close And Return And Verify Services Page Content
+    Click Element    //a[@class='button white small close']    #Button Sulge
+    Run Keyword And Continue On Failure    Verify Page Minu Teenused
+
+Icon Close And Return And Verify Services Page Content
+    Click Element    //div[contains(@class, 'modalbox')]//div[@class='close']
+    Run Keyword And Continue On Failure    Verify Page Minu Teenused

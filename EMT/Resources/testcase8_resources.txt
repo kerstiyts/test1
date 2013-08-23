@@ -1,0 +1,18 @@
+*** Variables ***
+${maacEN1}        Andrus
+${maacPN1}        Navi
+${IK1}            37210222799
+${MAAC1_ref}      2491211000
+${MAAC1}          Navi, Andrus
+${susgEN1}        Andrus
+${susgPN1}        Navi
+${SUSG1}          Andrus Navi
+${susgNUM1}       5026219
+${link_title_order_KER}    Eristuse tellimine
+${link_title_order_KER_history}    Tellitud eristused
+# ${link_title_order_KER_history}    Tellitud väljavõtted
+${email_to}       kersti.yts@emt.ee    #Testimisejareliisigrupp@emt.ee #Prelive@emt.ee
+${message_ok}     Teenuste väljavõtte tellimus on edastatud ja töötlemisel, mis võib kesta kuni kaks tundi. Valmis väljavõtte leiad "Tellitud väljavõtted" alt.
+${title_order_KER_history}    Viimase 3 kuu tellitud teenuste eristused
+
+*** Keywords ***

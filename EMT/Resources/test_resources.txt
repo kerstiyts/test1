@@ -1,0 +1,39 @@
+SELECT distinct cust.acc_ref_num, cust.susg_ref_num, cust.company_name, cust.p_forename, cust.p_surname, cust.s_forename, cust.s_surname, cust.social_security_id, ratings.creditrating 
+FROM 
+(SELECT * FROM 
+  (SELECT accounts.ref_num AS acc_ref_num, accounts.part_ref_num AS part_ref_num, subs_packages.gsm_susg_ref_num, parties.company_name, parties.forename AS p_forename, parties.surname AS p_surname, subscriber_info.surname AS s_surname, subscriber_info.forename AS s_forename 
+    FROM subs_packages, accounts, parties, subscriber_info, fixed_term_contracts
+    WHERE
+     subs_packages.sept_type_code = 'NO75' AND -- m‰‰rab paketi
+     subs_packages.suac_ref_num = accounts.ref_num AND
+     subs_packages.gsm_susg_ref_num = subscriber_info.susg_ref_num AND
+     accounts.part_ref_num = parties.ref_num 
+   ) tbcis
+   INNER JOIN 
+   (SELECT susg_ref_num, social_security_id FROM 
+      (SELECT val.data_ AS susg_ref_num, usr.userid 
+        FROM lportal.expandovalue@lportal val, lportal.user_@lportal usr
+        WHERE 
+         val.columnid = 123763 AND
+         val.tableid = 123753 AND
+         val.companyid = 10115 AND
+         val.classpk = usr.userid
+       ) susg
+       INNER JOIN
+       (SELECT value.data_ AS social_security_id, usr.userid
+         FROM lportal.expandovalue@lportal value, lportal.user_@lportal usr, lportal.users_roles@lportal rol
+         WHERE 
+          value.columnid = 123754 AND
+          value.tableid = 123753 AND
+          value.companyid = 10115 AND
+          value.classpk = usr.userid AND
+          usr.userid = rol.userid AND
+          usr.active_ = 1 AND
+          rol.roleid = 123791 -- roleid
+        ) us
+      ON us.userid = susg.userid
+  ) liferay 
+  ON tbcis.gsm_susg_ref_num = liferay.susg_ref_num
+   )cust INNER JOIN 
+   DWH_MAAC_CREDITRATINGS@crm ratings  
+ON ratings.part_ref_num = cust.part_ref_num where ratings.creditrating = 2 and rownum < 2

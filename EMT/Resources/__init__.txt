@@ -1,0 +1,2 @@
+*** Settings ***
+Resource          C:\Users\Kersti.Yts\Desktop\EMT_git\EMT\Resources\testcase1_query.txt

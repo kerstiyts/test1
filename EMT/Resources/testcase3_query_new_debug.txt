@@ -1,0 +1,22 @@
+SELECT distinct cust.acc_ref_num, cust.gsm_susg_ref_num, cust.company_name, cust.p_forename, cust.p_surname, cust.s_forename, cust.s_surname, cust.social_security_id, substr(cust.senu_num, 4,8) as susg_num, ratings.creditrating 
+FROM DWH_MAAC_CREDITRATINGS@crm ratings INNER JOIN
+ (SELECT * FROM 
+  (SELECT accounts.ref_num AS acc_ref_num, accounts.part_ref_num AS part_ref_num, subs_packages.gsm_susg_ref_num, senu_susg.senu_num,  parties.company_name, substr(parties.social_security_id, 1, 11) as social_security_id, parties.forename AS p_forename, parties.surname AS p_surname, subscriber_info.surname AS s_surname, subscriber_info.forename AS s_forename 
+    FROM subs_packages, accounts, parties, subscriber_info, fixed_term_contracts, senu_susg
+    WHERE
+     --subs_packages.sept_type_code in ('NO70', 'NO75', 'NO80', 'NO90', 'NO95') AND -- määrab paketi
+     subs_packages.end_date is null and
+     subscriber_info.susg_ref_num not in (select fixed_term_contracts.susg_ref_num from fixed_term_contracts  where fixed_term_contracts.end_date > sysdate) and -- excluding all subscriptions with ongoing commitments
+     subs_packages.suac_ref_num = accounts.ref_num AND
+     subs_packages.gsm_susg_ref_num = subscriber_info.susg_ref_num AND
+     subs_packages.gsm_susg_ref_num = senu_susg.susg_ref_num AND
+     senu_susg.end_date is null and
+     accounts.part_ref_num = parties.ref_num and
+     parties.person = 'Y' and
+     accounts.part_ref_num not in (select accounts.part_ref_num from accounts where accounts.HNOP_PART_REF_NUM ='4482612') and -- excluding all parties with PRE-PAID Diil accounts
+     senu_susg.senu_num = '37253408572' -- NB! Just for selecting the subscriber with the problem last name
+     -- and not REGEXP_LIKE(subscriber_info.surname, '[^0-9a-zA-Z/?(). ,''+-]') -- will exclude ALL special chars
+   ) tbcis 
+   )cust 
+ON ratings.part_ref_num = cust.part_ref_num where
+rownum < 2

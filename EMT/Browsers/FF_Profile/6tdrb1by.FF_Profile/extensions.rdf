@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns:NS1="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:mozilla:item:{CAFEEFAC-0016-0000-0020-ABCDEFFEDCBA}"
+                   NS1:installLocation="app-global"
+                   NS1:version="6.0.20"
+                   NS1:name="Java Console">
+    <NS1:type NC:parseType="Integer">2</NS1:type>
+    <NS1:targetApplication RDF:resource="rdf:#$sbIf31"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="rdf:#$EpvR92"
+                   NS1:id="toolkit@mozilla.org"
+                   NS1:minVersion="1.9.1"
+                   NS1:maxVersion="1.9.2.*" />
+  <RDF:Description RDF:about="rdf:#$FpvR92"
+                   NS1:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   NS1:minVersion="3.5"
+                   NS1:maxVersion="3.6.*" />
+  <RDF:Description RDF:about="urn:mozilla:item:{972ce4c6-7e08-4474-a285-3208198ce6fd}"
+                   NS1:installLocation="app-global"
+                   NS1:version="3.6.8"
+                   NS1:internalName="classic/1.0"
+                   NS1:locked="true"
+                   NS1:appManaged="true"
+                   NS1:name="Default"
+                   NS1:description="The default theme."
+                   NS1:creator="Mozilla"
+                   NS1:contributor="Mozilla Contributors">
+    <NS1:type NC:parseType="Integer">4</NS1:type>
+    <NS1:targetApplication RDF:resource="rdf:#$HbIf31"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="urn:mozilla:item:litmus-ff@f-secure.com"
+                   NS1:installLocation="winreg-app-global"
+                   NS1:version="1.10"
+                   NS1:updateURL="https://10.70.0.25/fireup/update.rdf"
+                   NS1:iconURL="chrome://litmus-ff/skin/logo.png"
+                   NS1:name="Browsing Protection"
+                   NS1:description="Browsing Protection Toolbar"
+                   NS1:creator="(c) 2007 by F-Secure"
+                   NS1:homepageURL="http://www.f-secure.com/">
+    <NS1:type NC:parseType="Integer">2</NS1:type>
+    <NS1:targetApplication RDF:resource="rdf:#$6mVtN"/>
+  </RDF:Description>
+  <RDF:Seq RDF:about="urn:mozilla:item:root">
+    <RDF:li RDF:resource="urn:mozilla:item:{972ce4c6-7e08-4474-a285-3208198ce6fd}"/>
+    <RDF:li RDF:resource="urn:mozilla:item:{CAFEEFAC-0016-0000-0020-ABCDEFFEDCBA}"/>
+    <RDF:li RDF:resource="urn:mozilla:item:litmus-ff@f-secure.com"/>
+    <RDF:li RDF:resource="urn:mozilla:item:firebug@software.joehewitt.com"/>
+  </RDF:Seq>
+  <RDF:Description RDF:about="rdf:#$HbIf31"
+                   NS1:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   NS1:minVersion="3.6.8"
+                   NS1:maxVersion="3.6.8" />
+  <RDF:Description RDF:about="rdf:#$sbIf31"
+                   NS1:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   NS1:minVersion="1.0"
+                   NS1:maxVersion="5.0+" />
+  <RDF:Description RDF:about="rdf:#$6mVtN"
+                   NS1:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   NS1:minVersion="3.0"
+                   NS1:maxVersion="13.*" />
+  <RDF:Description RDF:about="urn:mozilla:item:firebug@software.joehewitt.com"
+                   NS1:installLocation="app-profile"
+                   NS1:version="1.5.4"
+                   NS1:iconURL="chrome://firebug/content/firebug.png"
+                   NS1:name="Firebug"
+                   NS1:description="Web Development Evolved."
+                   NS1:creator="Joe Hewitt"
+                   NS1:homepageURL="http://www.getfirebug.com/">
+    <NS1:type NC:parseType="Integer">2</NS1:type>
+    <NS1:translator>Leszek(teo)Życzkowski (pl-PL)</NS1:translator>
+    <NS1:translator>markh (nl-NL)</NS1:translator>
+    <NS1:translator>peter3 (sv-SE)</NS1:translator>
+    <NS1:translator>AlleyKat (da-DK)</NS1:translator>
+    <NS1:translator>Hector Zhao, lovelywcm (zh-CN)</NS1:translator>
+    <NS1:translator>Lukáš Kucharczyk, Michal Kec (cs-CZ)</NS1:translator>
+    <NS1:translator>Team erweiterungen.de, ReinekeFux, Benedikt Langens (de-DE)</NS1:translator>
+    <NS1:translator>l0stintranslation, gonzalopirobutirro (it-IT)</NS1:translator>
+    <NS1:translator>alexxed (ro-RO)</NS1:translator>
+    <NS1:translator>Nicolas Martin, Franck Marcia (fr-FR)</NS1:translator>
+    <NS1:translator>gLes (hu-HU)</NS1:translator>
+    <NS1:translator>Xavi Ivars - Softcatalà (ca)</NS1:translator>
+    <NS1:translator>gezmen (tr-TR)</NS1:translator>
+    <NS1:translator>eternoendless (es-AR)</NS1:translator>
+    <NS1:translator>Dark Preacher (ru-RU)</NS1:translator>
+    <NS1:translator>Tiago Oliveira, Diego de Carvalho Zimmermann, Alexandre Rapaki (pt-BR)</NS1:translator>
+    <NS1:translator>Juan Botías (es-ES)</NS1:translator>
+    <NS1:translator>Andriy Zhouck (uk-UA)</NS1:translator>
+    <NS1:translator>Hisateru Tanaka (ja-JP)</NS1:translator>
+    <NS1:translator>Mohsen Shadroo (fa-IR)</NS1:translator>
+    <NS1:translator>Eduard Babayan (hy-AM)</NS1:translator>
+    <NS1:translator>Helder Magalhães (pt-PT)</NS1:translator>
+    <NS1:translator>Tomaž Mačus (sl-SI)</NS1:translator>
+    <NS1:translator>Stoyan Stefanov (bg-BG)</NS1:translator>
+    <NS1:translator>Kristján Bjarni Guðmundsson (is-IS)</NS1:translator>
+    <NS1:translator>NGUYỄN Mạnh Hùng (vi-VN)</NS1:translator>
+    <NS1:translator>Bwah (hr-HR)</NS1:translator>
+    <NS1:translator>Sonickydon (el-GR)</NS1:translator>
+    <NS1:contributor>John J. Barton (IBM Almaden)</NS1:contributor>
+    <NS1:contributor>Jan Odvarko (Mozilla Corp.)</NS1:contributor>
+    <NS1:contributor>Max Stepanov (Aptana Inc.)</NS1:contributor>
+    <NS1:contributor>Rob Campbell (Mozilla Corp.)</NS1:contributor>
+    <NS1:contributor>Hans Hillen (Paciello Group, Mozilla)</NS1:contributor>
+    <NS1:contributor>Curtis Bartley (Mozilla Corp.)</NS1:contributor>
+    <NS1:contributor>Mike Collins (IBM Almaden)</NS1:contributor>
+    <NS1:contributor>Kevin Decker</NS1:contributor>
+    <NS1:contributor>Mike Ratcliffe (Comartis AG)</NS1:contributor>
+    <NS1:contributor>Hernan Rodríguez Colmeiro</NS1:contributor>
+    <NS1:contributor>Austin Andrews</NS1:contributor>
+    <NS1:contributor>Christoph Dorn</NS1:contributor>
+    <NS1:contributor>Steven Roussey (AppCenter Inc, Network54)</NS1:contributor>
+    <NS1:targetApplication RDF:resource="rdf:#$EpvR92"/>
+    <NS1:targetApplication RDF:resource="rdf:#$FpvR92"/>
+  </RDF:Description>
+</RDF:RDF>

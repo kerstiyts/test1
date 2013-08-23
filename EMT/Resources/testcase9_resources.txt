@@ -1,0 +1,276 @@
+*** Settings ***
+Resource          common_resources.txt
+
+*** Variables ***
+${IK1}            37504026538    # Customer number
+${lrEN1}          Silver    # First name
+${lrPN1}          Kisla    # Last name
+${MAAC1}          Kisla, Silver    # AccountName
+${MAAC1_ADDRESS}    ${EMPTY}
+${susgEN1}        SILVER    # First name of active user
+${susgPN1}        KISLA    # Last name of active user
+${susgNUM1}       53401449    # Mobile number
+${OFFER}          2012-JAAN-INTERNET-1EUR-ERA
+
+*** Keywords ***
+Go To Offer Page
+    Click Link    Vaata kõiki pakkumisi
+
+Verify Offer Page
+    Wait Until Page Contains Element    //div[@class="tabbed-menu-tabs"]//a[@title="Pakkumised"]    ${TIMEOUT}
+    Page Should Contain Element    //h1[contains(text(), "Sinu personaalsed pakkumised")]    #H1 title
+    Page Should Contain Element    //span[@class="offer-title" and contains(text(), "${OFFER}")]    #offer title
+    Page Should Contain Element    //span[@class="hover-box" and contains(text(), "${OFFER}")]    #hover text
+    #Page Should Contain Element    //div[@class="tabbed-box-container"]//div[contains(@class, "offer")]//a//img[@alt="EMT Internet 1 € eest kuus!"]    #offer picture
+
+Select Offer
+    [Arguments]    ${offer_text}
+    Click Image    //div[@class="tabbed-box-container"]//a/img[@alt="${offer_text}"]
+    Wait Until Page Contains Element    //div[@class="container page"]    ${TIMEOUT}
+
+Verify Offer Details Page
+    #Page Should Contain Element    //h1[contains (text(), "EMT Internet ")]/span[contains (text(), "1 € eest kuus!")]    #Offer title
+    #Page Should Contain Element    //div[@class="portlet-borderless-container"]//p[contains (text(), "EMT Internet levib kiirusel kuni")]    #Offer's description
+    Element Should Contain    //a[@class="usage-needs-authentication button red large"]    Vormista uus liitumine    #Button Vormista uus liitumine
+    Element Should Contain    //a[@class="usage-needs-authentication button white large"]    Vormista oma numbrile    #Button Vormista oma numbrile
+    #Page Should Contain Element    //a/span[contains (text(), "Tutvustus")]    #Tab Tutvustus
+    #Page Should Contain Element    //a/span[contains (text(), "Tingimused")]    #Tab Tingimused
+
+Click Button Vormista oma numbrile
+    Click Element    //a[@class="usage-needs-authentication button white large"]    #Click button 'Vormista oma numbrile'
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[@class="active first"]//span[text()="Paketivalik"]    ${TIMEOUT}
+
+Verify Modal Window Paketivalik
+    Comment    Title
+    Element Should Contain    //div[@class="modalbox-holder"]//div[@class='title']    Paketivahetus
+    Comment    Progress bar
+    Element Should Contain    //div[@class="modalbox-container"]//li[2]/span    Interneti valik
+    Element Should Contain    //div[@class="modalbox-container"]//li[3]/span    Kinnitamine
+    Element Should Contain    //div[@class="modalbox-container"]//li[4]/span    Ostukorv
+    Comment    H1
+    Element Should Contain    //div[@class="content"]/h1    Palun vali pakett
+    Comment    Text
+    Element Should Contain    //div[@class="content"]/p    EMT Kodu-/Äriinternet on eraldiseisva SIM-kaardiga teenuspakett interneti kasutamiseks arvutis netipulga või WiFi-ruuteriga.
+    Comment    Sidebar
+    Element Should Contain    //div[@class = "modalbox-sidebar"]//h2    Kokkuvõte
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p    Mobiilinumber:\n${susgNUM1}
+    Comment    Buttons
+    Element Should Contain    //div[@class="modalbox-container"]//a[@class="button white cancel reverse"]    Tühista
+    Element Should Contain    //div[@class="modalbox-container"]//button[@class="button white back"]    Tagasi
+    Element Should Contain    //div[@class="modalbox-container"]//button[@class="button red next"]    Jätka
+
+Verify Modal Window Internetivalik
+    Comment    Progress bar
+    Element Should Contain    //div[@class="modalbox-container"]//li[1]/span    Paketivalik
+    Element Should Contain    //div[@class="modalbox-container"]//li[3]/span    Kinnitamine
+    Element Should Contain    //div[@class="modalbox-container"]//li[4]/span    Ostukorv
+    Comment    Title
+    Element Should Contain    //div[@class="modalbox-holder"]//div[@class='title']    Paketivahetus
+    Comment    Sidebar
+    Element Should Contain    //div[@class = "modalbox-sidebar"]//h2    Kokkuvõte
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[1]    Mobiilinumber:\n${susgNUM1}
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[2]    Pakett:\nEMT Kodu-/Äriinternet
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[1]/p    Kuutasu kokku:
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[2]/p    Teenustasud kokku:
+    Comment    Calculator area
+    Element Should Contain    //div[@class="content"]/h1    EMT Interneti paketi valik
+    Element Should Contain    //div[@class="ui-slider-title"]    Internet (maht/kiirus)
+    Page Should Contain Element    //ol[@id="calculator"]
+    Comment    Summary
+    Element Should Contain    //div[@class="calculator-content"]//div[@class="info"]    Hinnad on toodud käibemaksuga
+    Element Should Contain    //dl[@class="clear price-box"]/dt[1]    Ühekordne teenustasu:
+    #Element Should Contain    //dl[@class="clear price-box"]/dd[1]    1.62 €
+    Comment    Buttons
+    Element Should Contain    //div[@class="modalbox-container"]//a[@class="button white cancel reverse"]    Tühista
+    Element Should Contain    //div[@class="modalbox-container"]//button[@class="button white back"]    Tagasi
+    Element Should Contain    //div[@class="modalbox-container"]//button[@class="button red next"]    Jätka
+
+Verify Modal Window Kinnitamine
+    Comment    Progress bar
+    Element Should Contain    //div[@class="modalbox-container"]//li[1]/span    Paketivalik
+    Element Should Contain    //div[@class="modalbox-container"]//li[2]/span    Interneti valik
+    Element Should Contain    //div[@class="modalbox-container"]//li[4]/span    Ostukorv
+    Comment    Title
+    Element Should Contain    //div[@class="modalbox-holder"]//div[@class='title']    Paketivahetus
+    Comment    Sidebar
+    Element Should Contain    //div[@class = "modalbox-sidebar"]//h2    Kokkuvõte
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[1]    Mobiilinumber:\n${susgNUM1}
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[2]    Pakett:\nEMT Kodu-/Äriinternet
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[1]/p    Kuutasu kokku:
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[2]/p    Teenustasud kokku:
+    Comment    H1
+    Element Should Contain    //div[@class="content"]/h1    Kinnitamine
+    Comment    Buttons
+    Element Should Contain    //div[@class="modalbox-container"]//a[@class="button white cancel reverse"]    Tühista
+    Element Should Contain    //div[@class="modalbox-container"]//button[@class="button white back"]    Tagasi
+    Element Should Contain    //div[@class="modalbox-container"]//a[@class="button red small"]    Kinnita
+    Page Should Contain Element    //p[@class="agreement"]//label[contains(text(), "Kinnitan, et lugesin läbi ja nõustun tingimustega")]
+
+Verify Modal Window Allkirjastamine
+    Comment    Progress bar
+    Element Should Contain    //div[@class="modalbox-container"]//li[1]/span    Paketivalik
+    Element Should Contain    //div[@class="modalbox-container"]//li[2]/span    Interneti valik
+    Element Should Contain    //div[@class="modalbox-container"]//li[3]/span    Kinnitamine
+    Element Should Contain    //div[@class="modalbox-container"]//li[4]/span    Ostukorv
+    Comment    Title
+    Element Should Contain    //div[@class="modalbox-holder"]//div[@class='title']    Paketivahetus
+    Comment    Sidebar
+    Element Should Contain    //div[@class = "modalbox-sidebar"]//h2    Kokkuvõte
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[1]    Mobiilinumber:\n${susgNUM1}
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[2]    Pakett:\nEMT Kodu-/Äriinternet
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[1]/p    Kuutasu kokku:
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[2]/p    Teenustasud kokku:
+    Comment    Radiobuttons
+    #Page Should Contain Element    //label[@for="_packagechange_WAR_processportlets_mid_sign" and contains(text(), 'Allkirjastamine Mobiil-ID-ga')]    #Allkirjastamine Mobiil-ID-ga
+    #Page Should Contain Element    //label[@for="_packagechange_WAR_processportlets_id_sign" and contains(text(), 'Allkirjastamine ID-kaardiga')]    #Allkirjastamine ID-kaardiga
+    #Page Should Contain Element    //label[@ for="_packagechange_WAR_processportlets_parcel_sign" and contains(text() 'Allkirjastan kulleriga toodud lepingu')]    #Allkirjastan kulleriga toodud lepingu
+    Element Should Contain    //fieldset//li[1]/label[2]    Allkirjastamine Mobiil-ID-ga
+    Element Should Contain    //fieldset//li[2]/label[2]    Allkirjastamine ID-kaardiga
+    Element Should Contain    //fieldset//li[3]/label[2]    Allkirjastan kulleriga toodud lepingu
+
+Verify Modal Window Ostukorv
+    Comment    Progress bar
+    Element Should Contain    //div[@class="modalbox-container"]//li[1]/span    Paketivalik
+    Element Should Contain    //div[@class="modalbox-container"]//li[2]/span    Interneti valik
+    Element Should Contain    //div[@class="modalbox-container"]//li[3]/span    Kinnitamine
+    Element Should Contain    //div[@class="modalbox-container"]//li[4]/span    Ostukorv
+    Comment    Title
+    Element Should Contain    //div[@class="modalbox-holder"]//div[@class='title']    Paketivahetus
+    Comment    Sidebar
+    Element Should Contain    //div[@class = "modalbox-sidebar"]//h2    Kokkuvõte
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[1]    Mobiilinumber:\n${susgNUM1}
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[2]    Pakett:\nEMT Kodu-/Äriinternet
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[1]/p    Kuutasu kokku:
+    Element Should Contain    //div[@class="modalbox-sidebar"]//ul[@class="more-info"]//li[2]/p    Teenustasud kokku:
+    Comment    Text
+    Element Should Contain    //div[@class="form-error"]    Järgnevalt palun täida kohaletoimetamisega seotud info.
+    Comment    Buttons
+    Element Should Contain    //button[@class="button white cancel "]    Sulge
+    Element Should Contain    //a[@class="button red small"]    Jätka
+
+Verify Page Ostukorv
+    [Documentation]    Verifys the shopping cart page.
+    #Wait for the page to load
+    Wait Until Page Contains Element    //div[@class='title']/h1[text()='Ostukorv']    ${TIMEOUT}
+    Comment    Tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    Comment    Text
+    Page Should Contain    Tellimuse kohale toimetamiseks palun tee märge vastava tellimuse juures ning vajuta nuppu "Saada tarnesse".
+    Page Should Contain    Kui soovid mitu tellimust ühele aadressile tellida, siis märgi ära kõik need tellimused ning vajuta nuppu "Saada tarnesse".
+    Comment    Product details
+    Page Should Contain Element    //table[@class='items']//tr/th/a[contains(text(),'Lepingu muutmine')]    #Column 1: Text "Lepingu muutmine"
+    Element Should Contain    //table[@class='items']//tr/td[1]    ${susgEN1} ${susgPN1}    #Column 2: Active user name
+    Page Should Contain Element    //table[@class='items']//tr/td[2]/a[@class='ico-file ico-pdf']    # Column 3: PDF icon
+    Element Should Contain    //table[@class='items']//tr/td[3]    Allkirjasta    #Column 4: Text "Allkirjasta"
+    Page Should Contain Element    //table[@class='items']//tr/td[4]/label[@class='label-check c-on']    #Column 5: Checkbox
+    Page Should Contain Element    //table[@class='items']//tr/td[5]/a[@class='ico-remove']    #Column 6: Remove icon
+    Comment    Summary
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[1]
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[2]
+    Should Match Regexp    ${res}    Käibemaks 20%:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[3]
+    Should Match Regexp    ${res}    Postikulud:\n.+€
+    ${res}=    Get Text    //div[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div[@class="sum clear"]/dl[4]
+    Should Match Regexp    ${res}    Kokku:\n.+€
+    Comment    Buttons
+    Element Should Contain    //div[@class='buttons']/a[@class='button white small']    Tellimuste ajalugu
+    Element Should Contain    //div[@class='buttons']/a[@class='button white cancel ']    Katkesta
+    Element Should Contain    //div[@class='buttons']/a[@class='button red small']    Jätka
+    Comment    Sidebar
+    Verify Sidebar LoggedIn
+
+Verify Page Ostukorv - Kohaletoimetamine
+    Wait Until Page Contains Element    //div[@class='title']/h1[contains(text(),'Kohaletoimetamine')]    ${TIMEOUT}
+    Comment    Title
+    Title Should Be    Ostukorv - EMT
+    Comment    Tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    Comment    H3 Kohaletoimetamise viis
+    Page Should Contain Element    //h3[contains(text(),'Kohaletoimetamise viis')]
+    Comment    Delivery type radio buttons
+    Page Should Contain Element    //label[@for='_shoppingcart_WAR_servicesportlets_deliveryTypeCourier' and text()='Kuller']
+    Comment    H3 Kohaletoimetamise aadress
+    Page Should Contain Element    //h3[contains(text(),'Kohaletoimetamise aadress')]
+    Comment    Address
+    Page Should Contain Radiobutton    name=selectedAddressRefNum
+    Page Should Contain Link    //a[text()='Määra uus aadress']
+    Comment    H3 Vastuvõtja andmed
+    Page Should Contain Element    //h3[contains(text(),'Vastuvõtja andmed')]
+    Comment    Receiver data fields
+    Page Should Contain Element    //input[@id='contactName' and @value='${lrEN1} ${lrPN1}' and @type='hidden']
+    Element Should Contain    //span[@id='clientName']    ${lrEN1} ${lrPN1}
+    Element Should Contain    //input[@id='contactName' and @value='${lrEN1} ${lrPN1}']/../..    Nimi:*
+    Page Should Contain Textfield    //input[@id='contactPhone' and @value='${susgNUM1}']
+    Element Should Contain    //input[@id='contactPhone' and @value='${susgNUM1}']/../..    Vastuvõtja telefon:*
+    Page Should Contain Element    //select[@id='deliveryTimes']
+    Element Should Contain    //select[@id='deliveryTimes']/..    Kättetoimetamise aeg:*
+    Page Should Contain Element    //textarea[@id='_shoppingcart_WAR_servicesportlets_shipNotes']
+    Element Should Contain    //textarea[@id='_shoppingcart_WAR_servicesportlets_shipNotes']/../../..    Märkused:
+    #Comment    H3 Arve saadetakse    INVOICE FIELDS ARE MISSING!
+    #Page Should Contain Element    //h3[contains(text(),'Arve saadetakse')]
+    #Invoice data fields
+    #Page Should Contain Textfield    //input[@id='nameOnBill' and @value='${MAAC1}']
+    #Element Should Contain    //input[@id='nameOnBill' and @value='${MAAC1}']/../..    Nimi arvel:
+    #Page Should Contain Textfield    //input[@id='billAddress']
+    #Element Should Contain    //input[@id='billAddress']/../..    Arve aadress:
+    #Page Should Contain Checkbox    id=_shoppingcart_WAR_servicesportlets_billTypeEmail
+    #Element Should Contain    //label[@for='_shoppingcart_WAR_servicesportlets_billTypeEmail'][2]    Soovid arvet e-postile
+    #Page Should Contain Textfield    id=_shoppingcart_WAR_servicesportlets_emailAddress
+    #Element Should Contain    //input[@id='_shoppingcart_WAR_servicesportlets_emailAddress']/../..    E-posti aadress:*
+    #Page Should Contain Checkbox    id=_shoppingcart_WAR_servicesportlets_billTypePost
+    #Element Should Contain    //input[@id='_shoppingcart_WAR_servicesportlets_billTypePost']/../../..    Soovid arvet postiga
+    \    #H1 Tellimistingimused
+    Page Should Contain Element    //h1[text()='Tellimistingimused']
+    Comment    Checkbox
+    Page Should Contain Checkbox    id=_shoppingcart_WAR_servicesportlets_deliveryTerms
+    Page Should Contain Element    //label[@for='_shoppingcart_WAR_servicesportlets_deliveryTerms' and text()='Kinnitan, et tutvusin ja nõustun tingimustega']
+    Comment    Buttons
+    Element Should Contain    //a[@class='button white back']    Tagasi
+    Element Should Contain    //a[@class='button red small']    Salvesta
+    Comment    Summary
+    ${res}=    Get Text    //div[@class='sum clear']
+    Should Match Regexp    ${res}    Toodete maksumus kokku:\n.+€\nKäibemaks 20%:\n.+€\nPostikulud:\n.+€\nKokku:\n.+€
+
+Fill In Shipping Options
+    Click Element    //label[@for='_shoppingcart_WAR_servicesportlets_deliveryTypeCourier']    #Select Radio Button    deliveryType    KULLER
+    Sleep    2
+    #Click Element    //tr[./td[contains(., '${MAAC1_ADDRESS}')]]/td/label[@class='label-radio']    #Select address
+    Click Element    //form[@id="_shoppingcart_WAR_servicesportlets_shoppingCartSelectedAddressForm"]//tr[contains(@id, "_shoppingcart_WAR_servicesportlets")][1]//td[1]/label[contains(@class, "label-radio")]    #Select first address
+    Sleep    3
+    Click Element    //div[@class="form-two-column clear"]//a[@class="altselect-trigger"]    #Click dropdown list
+    Sleep    3
+    ${temp}=    Get Text    //ul[@class="altselect"]/li[2]/a
+    Click Link    ${temp}    #Action: Select first option in Dropdown Menu
+    Input Text    id=_shoppingcart_WAR_servicesportlets_shipNotes    autotest    #Fill in note
+    Click Element    //label[@for="_shoppingcart_WAR_servicesportlets_deliveryTerms" and @class="label-check"]    #Select checbox
+    Click Link    //a[@class='button red small']    #Click Salvesta
+
+Verify Order History
+    #Wait for the page to load
+    Wait Until Page Contains    Tehingu liik    ${TIMEOUT}
+    Comment    Title
+    Page Should Contain Element    //h1[contains(text(), "Tellimuste ajalugu")]
+    Comment    Order history
+    ${day}=    Get Time    day
+    ${month}=    Get Time    month
+    ${year}=    Get Time    year
+    Page Should Contain Element    //tbody/tr[./td[contains(., 'Lepingu muutmine')] and ./td[contains(., '${susgNUM1}/${susgEN1} ${susgPN1}')] and ./td[contains(., '${day}.${month}.${year}')] and ./td[contains(., 'Kohaletoimetamisel')]]
+    ${order}=    Get Text    //tbody/tr[./td[contains(., 'Lepingu muutmine')] and ./td[contains(., '${susgNUM1}/${susgEN1} ${susgPN1}')] and ./td[contains(., '${day}.${month}.${year}')] and ./td[contains(., 'Kohaletoimetamisel')]]/td[5]
+
+Check That Order Was Succesfull - case 9
+    Wait Until Page Contains Element    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    ${TIMEOUT}
+    #H1
+    Run Keyword And Continue On Failure    Page Should Contain Element    //h1[text()=' Kohaletoimetamine ']
+    #Title
+    Title Should Be    Ostukorv - EMT
+    #Verify tabs
+    Page Should Contain Link    //li[contains(@class, "ui-state-active")]/a[contains(@title, "Tarnesse saatmine")]    #Acitve tab
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Sidebar
+    Verify Sidebar LoggedIn

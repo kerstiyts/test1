@@ -1,0 +1,12 @@
+*** Settings ***
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/debug_resources.txt
+Variables         ../Resources/test.py
+
+*** Test Cases ***
+Resetting Saldo
+    [Tags]    ResetSaldo    Supportative
+    [Setup]    Open Browser    ${homepage}    browser=chrome
+    Delete All Cookies
+    Maximize Browser Window
+    Reset Subscribers Saldo

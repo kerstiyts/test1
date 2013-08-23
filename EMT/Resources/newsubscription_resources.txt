@@ -1,0 +1,80 @@
+*** Settings ***
+Library           Selenium2Library
+Library           Collections
+Library           String
+
+*** Keywords ***
+minuEMT - package config
+    Validate Internet on phone
+    Validate Call minutes slider
+    Validate SMS slider
+    Element Should Contain    //div[@class="icobox euro"]/p[1]    Sinu hinnavõit on
+    ${res}=    Get Text    //div[@class="icobox euro"]/p[1]/strong
+    Should Match Regexp    ${res}    .*\\d+\.\\d+ EUR    # yy.yy EUR
+    #Summary:
+    Element Should Contain    //div[@class="total clear"]//div[@class="info"]    Hinnad on toodud käibemaksuga
+    Element Should Contain    //div[@class="total clear"]//dt[1]    Toote hind:
+    Element Should Contain    //div[@class="total clear"]//dd[1]    0.00 €
+    Element Should Contain    //div[@class="total clear"]//dt[2]//strong    MinuEMT tasu:
+    ${res}=    Get Text    //div[@class="total clear"]//dd[2]//strong
+    Should Match Regexp    ${res}    .*\\d+\.\\d+ €/kuu    #yy.yy €/kuu
+
+EMT kodu-äri internet - package config
+    Internet on PC - slider
+    Sleep    5
+    Internet on PC - validate
+
+Internet on PC - slider
+    Click Element    //*[@id="_newcontract_WAR_processportlets_CHGGP-null-slider"]//ul[@class="steps clear"]//li[@class="last"]    #click on last position on slider
+
+Internet on PC - validate
+    Wait Until Keyword Succeeds    ${TIMEOUT}    2    Element Should Contain    //div[@class="calculator-description"]//b    EMT Internet arvutis XL+4G    #check if description is updated if slider is changed
+
+Validate Internet on phone
+    Page Should Contain    Internet
+    Click Element    //div[@id="_newcontract_WAR_processportlets_CHGGP-null-slider"]//li[@class="last"]    # last position on slider
+    Wait Until Keyword Succeeds    ${TIMEOUT}    2    Element Should Contain    //div[@class="groupitem calculator-data"]//span[@class="slider03-total"]    Internet
+    Sleep    1
+    #${data_value}=    Get Text    //div[@class="groupitem calculator-data"]//span[@class="slider03-value"]
+    #${data_value}=    Replace String    ${data_value}    MB    ${EMPTY}
+    #${data_bonus}=    Get Text    //div[@class="groupitem calculator-data"]//span[@class="slider03-bonus"]
+    #${status}    ${data_additional}=    Run Keyword And Ignore Error    Get Text    //div[@class="groupitem calculator-data"]//span[@class="slider03-additional"]
+    #Run Keyword If    '${status}' == 'PASS'    ${DataTotalExpected}=    (int(${data_value})+int(${data_bonus})+int(${data_additional}))    ELSE    ${DataTotalExpected}=    (int(${data_value})+int(${data_bonus}))
+    #${data_additional}=    Get Text    //div[@class="groupitem calculator-data"]//span[@class="slider03-additional"]
+    ${data_total_actual}=    Get Text    //div[@class="groupitem calculator-data"]//span[@class="slider03-total"]
+    ${res}=    Replace String    ${data_total_actual}    MB    ${EMPTY}
+    Set Test Variable    ${DataTotalActual}    ${res}
+    #Set Test Variable    ${DataTotalActual}    ${res}
+    #${DataTotalExpected}=    (int(${data_value})+int(${data_bonus})+int(${data_additional}))
+    #${data_total_result}=    Evaluate    ${DataTotalActual}==${DataTotalExpected}
+    #Should Be True    ${data_total_result}
+
+Validate Call minutes slider
+    Page Should Contain    Kõned (min)
+    Click Element    //div[@id="_newcontract_WAR_processportlets_PPCAL-null-slider"]//li[@class="last"]    # last position for calls slider
+    Wait Until Keyword Succeeds    ${TIMEOUT}    2    Element Should Contain    //div[@class="groupitem calculator-calls"]//span[@class="slider01-value"]    1115
+    Sleep    20    #Page Should Contain Element    //div[@class="ui-slider-title"][2]/text()=' Sõnumid (tk) '    #${calls_value}=    Get Text    //div[@class="groupitem calculator-calls"]//span[@class="slider01-value"]
+    ...    #${calls_bonus}=    Get Text    //div[@class="groupitem calculator-calls"]//span[@class="slider01-bonus"]    #${status}    ${calls_additional}=    Run Keyword And Ignore Error
+    ...    #Get Text    //div[@class="groupitem calculator-calls"]//span[@class="slider01-additional"]    #${CallsTotalExpected}=    Set Variable    ${EMPTY}    #Run Keyword If
+    ...    #'${status}' == 'PASS'    ${CallsTotalExpected}=    Set Variable    (int(${calls_value})+int(${calls_bonus})+int(${calls_additional}))    ELSE    ${CallsTotalExpected}=
+    ...    #Set Variable    (int(${calls_value})+int(${calls_bonus}))
+    #${calls_additional}=    Get Text    //div[@class="groupitem calculator-calls"]//span[@class="slider01-additional"]
+    ${res}=    Get Text    //div[@class="groupitem calculator-calls"]//span[@class="slider01-total"]
+    Set Test Variable    ${CallsTotalActual}    ${res}
+    #${calls_total_result}=    Evaluate    ${CallsTotalActual}==${CallsTotalExpected}
+    #Should Be True    ${calls_total_result}
+
+Validate SMS slider
+    Page Should Contain    Sõnumid (tk)
+    Click Element    //div[@id="_newcontract_WAR_processportlets_PPSMS-null-slider"]//li[2]    # position 2 in SMS slider
+    Wait Until Keyword Succeeds    ${TIMEOUT}    2    Element Should Contain    //div[@class="groupitem calculator-messages"]//span[@class="slider02-value"]    35
+    #${messages_value}=    Get Text    //div[@class="groupitem calculator-messages"]//span[@class="slider02-value"]
+    #${messages_bonus}=    Get Text    //div[@class="groupitem calculator-messages"]//span[@class="slider02-bonus"]
+    #${status}    Run Keyword And Ignore Error    Page Should Contain Element    //div[@class="groupitem calculator-calls"]//span[@class="slider01-additional"]
+    #${status}    ${messages_additional}=    Run Keyword And Ignore Error    Get Text    //div[@class="groupitem calculator-calls"]//span[@class="slider01-additional"]
+    #Run Keyword If    '${status}' == 'PASS'    ${MessagesTotalExpected}=    (int(${messages_value})+int(${messages_bonus})+int(${messages_additional}))    ELSE    ${MessagesTotalExpected}=    (int(${messages_value})+int(${messages_bonus}))
+    #${messages_additional}=    Get Text    //div[@class="groupitem calculator-messages"]//span[@class="slider02-additional"]
+    ${res}=    Get Text    //div[@class="groupitem calculator-messages"]//span[@class="slider02-total"]
+    Set Test Variable    ${MessagesTotalActual}    ${res}
+    #${messages_total_result}=    Evaluate    ${MessagesTotalActual}==${MessagesTotalExpected}
+    #Should Be True    ${messages_total_result}

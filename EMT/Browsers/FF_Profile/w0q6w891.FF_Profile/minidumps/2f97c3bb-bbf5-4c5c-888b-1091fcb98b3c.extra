@@ -1,0 +1,16 @@
+Winsock_LSP=MSAFD Tcpip [TCP/IP] : 2 : 1 :  \n MSAFD Tcpip [UDP/IP] : 2 : 2 : %SystemRoot%\\system32\\mswsock.dll \n MSAFD Tcpip [RAW/IP] : 2 : 3 :  \n MSAFD Tcpip [TCP/IPv6] : 2 : 1 : %SystemRoot%\\system32\\mswsock.dll \n MSAFD Tcpip [UDP/IPv6] : 2 : 2 :  \n MSAFD Tcpip [RAW/IPv6] : 2 : 3 : %SystemRoot%\\system32\\mswsock.dll \n RSVP TCPv6 Service Provider : 2 : 1 :  \n RSVP TCP Service Provider : 2 : 1 : %SystemRoot%\\system32\\mswsock.dll \n RSVP UDPv6 Service Provider : 2 : 2 :  \n RSVP UDP Service Provider : 2 : 2 : %SystemRoot%\\system32\\mswsock.dll \n MSAFD RfComm [Bluetooth] : 2 : 1 : 
+AdapterVendorID=0x1002
+EMCheckCompatibility=true
+ProductName=Firefox
+Theme=classic/1.0
+Vendor=Mozilla
+InstallTime=1360845145
+ReleaseChannel=release
+Notes=AdapterVendorID: 0x1002, AdapterDeviceID: 0x9581, AdapterSubsysID: 30c5103c, AdapterDriverVersion: 8.632.1.2000\nD3D10 Layers? D3D10 Layers- D3D9 Layers? D3D9 Layers+ 
+Version=18.0.2
+ServerURL=https://crash-reports.mozilla.com/submit?id={ec8030f7-c20a-464f-9b0e-13a3a9e97384}&version=18.0.2&buildid=20130201065344
+AdapterDeviceID=0x9581
+Add-ons=csharpformatters%40seleniumhq.org:1.10.0,javaformatters%40seleniumhq.org:1.10.0,pythonformatters%40seleniumhq.org:1.10.0,rubyformatters%40seleniumhq.org:1.10.0,%7Ba6fd85ed-e919-4a43-a5af-8da18bda539f%7D:1.10.0,%7B7eb3f691-25b4-4a85-9038-9e57e2bcd537%7D:0.4.4,%7B972ce4c6-7e08-4474-a285-3208198ce6fd%7D:18.0.2,firebug%40software.joehewitt.com:1.11.2
+BuildID=20130201065344
+ProductID={ec8030f7-c20a-464f-9b0e-13a3a9e97384}
+CrashTime=1362558199

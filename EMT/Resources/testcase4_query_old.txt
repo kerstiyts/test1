@@ -1,0 +1,46 @@
+SELECT distinct cust.acc_ref_num, cust.susg_ref_num, cust.company_name, cust.p_forename, cust.p_surname, cust.s_forename, cust.s_surname, cust.social_security_id, cust.lr_fname,cust.lr_pname, ratings.creditrating, substr(cust.senu_num, 4,8) as susg_num
+FROM DWH_MAAC_CREDITRATINGS@crm ratings INNER JOIN
+ (SELECT * FROM 
+  (SELECT accounts.ref_num AS acc_ref_num, accounts.part_ref_num AS part_ref_num, subs_packages.gsm_susg_ref_num, senu_susg.senu_num,  parties.company_name, parties.forename AS p_forename, parties.surname AS p_surname, subscriber_info.surname AS s_surname, subscriber_info.forename AS s_forename 
+    FROM subs_packages, accounts, parties, subscriber_info, fixed_term_contracts, senu_susg
+    WHERE
+     subs_packages.sept_type_code = 'AMP' AND -- määrab paketi
+     subs_packages.end_date is null and
+     subscriber_info.susg_ref_num not in (select fixed_term_contracts.susg_ref_num from fixed_term_contracts  where fixed_term_contracts.end_date > sysdate) and -- excluding all subscriptions with ongoing commitments
+     subs_packages.suac_ref_num = accounts.ref_num AND
+     subs_packages.gsm_susg_ref_num = subscriber_info.susg_ref_num AND
+     subs_packages.gsm_susg_ref_num = senu_susg.susg_ref_num AND
+     senu_susg.end_date is null and
+     accounts.part_ref_num = parties.ref_num 
+   ) tbcis
+   INNER JOIN 
+   (SELECT susg_ref_num, social_security_id, lr_fname, lr_pname FROM 
+      (SELECT val.data_ AS susg_ref_num, usr.userid, usr.firstname AS lr_fname, usr.lastname as lr_pname
+        FROM lportal.expandovalue@lportal val, lportal.user_@lportal usr
+        WHERE 
+         val.columnid = 123763 AND
+         val.tableid = 123753 AND
+         val.companyid = 10115 AND
+         val.classpk = usr.userid
+       ) susg
+       INNER JOIN
+       (SELECT value.data_ AS social_security_id, usr.userid, usr.firstname AS lr_forename , usr.lastname as lr_surname
+         FROM lportal.expandovalue@lportal value, lportal.user_@lportal usr, lportal.users_roles@lportal rol
+         WHERE 
+          value.columnid = 123754 AND
+          value.tableid = 123753 AND
+          value.companyid = 10115 AND
+          value.classpk = usr.userid AND
+          usr.userid = rol.userid AND
+          usr.active_ = 1 AND
+          rol.roleid = 123791 -- roleid
+        ) us
+      ON us.userid = susg.userid
+  ) liferay 
+  ON tbcis.gsm_susg_ref_num = liferay.susg_ref_num --where rownum < 1000
+   )cust
+ON ratings.part_ref_num = cust.part_ref_num
+ WHERE ratings.remnant > 600 AND -- available credit
+ ratings.creditrating = 1 -- credit rating 2 or 3
+and rownum < 2
+

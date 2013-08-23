@@ -1,0 +1,24 @@
+SELECT distinct cust.acc_ref_num, cust.gsm_susg_ref_num, cust.maac_name, cust.p_forename, cust.p_surname, cust.s_forename, cust.s_surname, cust.social_security_id, substr(cust.senu_num, 4,8) as susg_num, ratings.creditrating
+FROM 
+(SELECT * FROM 
+  (SELECT accounts.maac_ref_num AS acc_ref_num, accounts.name AS maac_name, accounts.part_ref_num AS part_ref_num, subs_packages.gsm_susg_ref_num, parties.company_name, substr(parties.social_security_id, 1, 11) as social_security_id, parties.forename AS p_forename, parties.surname AS p_surname, subscriber_info.surname AS s_surname, subscriber_info.forename AS s_forename, senu_susg.senu_num 
+    FROM subs_packages, accounts, parties, subscriber_info, fixed_term_contracts, senu_susg
+    WHERE
+     subs_packages.sept_type_code ='AMP' AND -- määrab paketi
+     subs_packages.end_date is null and
+     subscriber_info.susg_ref_num not in (select fixed_term_contracts.susg_ref_num from fixed_term_contracts  where fixed_term_contracts.end_date > sysdate) and -- excluding all subscriptions with ongoing commitments
+     subs_packages.suac_ref_num = accounts.ref_num AND
+     subs_packages.gsm_susg_ref_num = subscriber_info.susg_ref_num AND
+     subs_packages.gsm_susg_ref_num = senu_susg.susg_ref_num AND
+     senu_susg.end_date is null and
+     accounts.part_ref_num = parties.ref_num and
+     parties.social_security_id is not null
+   ) tbcis
+)cust 
+INNER JOIN 
+DWH_MAAC_CREDITRATINGS@crm ratings  
+ON ratings.part_ref_num = cust.part_ref_num 
+where 
+ratings.creditrating > 1
+AND ratings.remnant > 2001
+and rownum < 2

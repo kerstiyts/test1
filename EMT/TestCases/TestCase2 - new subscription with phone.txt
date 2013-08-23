@@ -1,0 +1,173 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    ff    winTC2
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Test Timeout      15 minutes
+Resource          ../Resources/testcase2_resources.txt
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/newsubscription_resources.txt
+Resource          ../Resources/eshop_resources.txt
+Library           ../Resources/OracleDB_Library.py
+
+*** Variables ***
+
+*** Test Cases ***
+TestCase2
+    [Documentation]    Test Case 2, New user needed
+    [Tags]    TestCase2    Ready
+    Find Customer
+    Precheck
+    # Step 1.
+    Verify Start Page
+    # Step 2.
+    Go To Web Shop
+    Verify Web Shop Page When Logged Out
+    # Step 3.
+    Go To Smart Phones Page
+    Verify Smart Phones Page When Logged Out
+    # Step 4.
+    Select A Smart Phone
+    Verify Smart Phone Detailed View When Logged Out
+    # Step 5 - 8.
+    Select Phone With Package And Log In
+    # Step 9.
+    Verify Segmentation Selection And Select Item
+    # Step 10
+    Verify And Fill Data For New Subscription
+    # Step 11- 13.
+    Verify And Select Services
+    # Step 14 - 15.
+    Verify And Select New Number For Subscription
+    # Step 16.
+    Verify And Accept Contract
+    Sign Contract
+    # Step 17.
+    Accept Delivery
+    # Step 18.
+    Verify Shopping Cart Overview And Continue
+    # Step 19 - 20.
+    Verify And Select Delivery Address
+    #Step 21.
+    Go To Order History
+    Verify Order History
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Find Customer
+    Connect To Database    ${DB_USERNAME}    ${DB_PASSWORD}    ${DB_DSN}
+    ${query_results}=    Query From File    Resources/testcase2_query.txt
+    Disconnect From Database
+    Set Suite Variable    ${MAAC1_ref}    ${query_results[0][0]}
+    Set Suite Variable    ${MAAC1}    ${query_results[0][2]}
+    Set Suite Variable    ${maacEN1}    ${query_results[0][3]}
+    Set Suite Variable    ${maacPN1}    ${query_results[0][4]}
+    Set Suite Variable    ${susgEN1}    ${query_results[0][5]}
+    Set Suite Variable    ${susgPN1}    ${query_results[0][6]}
+    Set Suite Variable    ${IK1}    ${query_results[0][7]}
+    Set Suite Variable    ${susgNUM1}    ${query_results[0][8]}
+    #Set Suite Variable    ${lrEN1}    ${query_results[0][8]}
+    #Set Suite Variable    ${lrPN1}    ${query_results[0][9]}
+
+Precheck
+    Check Subscribers saldo    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC2
+
+Verify And Select Services
+    Verify Page Liitumine - Paketid
+    Click Element    xpath=//div[@id="_newcontract_WAR_processportlets_packages"]//a[contains(text(), '${PAK_KOM1}')]
+    Wait Until Page Contains Element    //button[@id="_newcontract_WAR_processportlets_packageButton"]    ${TIMEOUT}    #wait for Vali button
+    MinuEMT - package config
+    Click Button    //*[@id="_newcontract_WAR_processportlets_packageButton"]    #Click Vali
+
+Verify Shopping Cart Overview And Continue
+    Wait Until Page Contains    Tarnesse saatmine    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Ulevaade
+    #Action: Click Jätka
+    Click Element    //a[@id="_shoppingcart_WAR_servicesportlets_deliverySaveButton"]
+    Sleep    1
+    #Action: Click Popup Jah
+    Click Element    //div[@class="confirm"]//button[@id="confirmButton"]
+
+Verify Web Shop Page When Logged Out
+    Run Keyword And Continue On Failure    Verify Page E-pood
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedOut
+
+Go To Smart Phones Page
+    Click Link    Nutitelefonid    #don't wait
+
+Verify Smart Phones Page When Logged Out
+    Run Keyword And Continue On Failure    Verify Page Nutitelefonid
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedOut
+
+Select A Smart Phone
+    Search For Device    ${COMP1}    ${NAME1}
+    Click Link    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    #Click Vaata button
+
+Verify Smart Phone Detailed View When Logged Out
+    Run Keyword And Continue On Failure    Verify Product Page - Detailed view    ${KOOD1}    ${COMP1}    ${NAME1}
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedOut
+
+Select Phone With Package And Log In
+    Wait Until Page Contains Element    //div[@id="_eshop_WAR_eshopportletnew_mipaCalculatorContainer"]    ${TIMEOUT}
+    Click Element    xpath=//*[@class='button usage-needs-authentication openModal']    #Click element Vali
+    Run Keyword And Continue On Failure    Verify LogIn Window
+    Login    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1}
+    #Check Sidebar
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+
+Verify Segmentation Selection And Select Item
+    #Wait Until Page Contains    //div[@id="modal"]    ${TIMEOUT}
+    #Sleep    2
+    #Click Element    //div[@id="modal"]//a[@class="ajaxLink button"]
+    Click Element    xpath=//*[@class='button usage-needs-authentication openModal']
+    Wait Until Page Contains Element    //div[@id="modal"]//h2    ${TIMEOUT}
+    Element Should Contain    //div[@id="modal"]//h2    Palun vali, millise tegevusega soovid jätkata.
+    # Comment    Radio Button Should Not Be Selected    radio-group-duplicate2
+    Element Should Contain    xpath=//div[@id="modal"]//a[@class="button disabled"]    Jätka
+    # Step 9.
+    Click Element    //div[@id='modal']/ul/li[2]/label    #Click 2. button
+    Click Link    xpath=//div[@id="modal"]//a[@class="button"]    #Click Jätka
+
+Verify And Fill Data For New Subscription
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Andmed
+    Fill In Page Liitumine - Andmed    ${AutoEN2}    ${AutoPN2}
+
+Verify And Select New Number For Subscription
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Numbrivalik
+    Liitumine_Koik vabad numbrid
+    Click Element    //a[text()='Kõik vabad numbrid']/../..//button/span[text()='Jätka']    #Jätka
+
+Verify And Accept Contract
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[@class='active']//span[text()='Leping']    ${TIMEOUT}
+    Sleep    1
+    Verify Page Liitumine - Leping
+    Click Element    //label[contains(@for,'_newcontract_WAR_processportlets_termsForm') and @class="label-check"]
+    Click Element    //a[@id="_newcontract_WAR_processportlets_confirmBtn"]
+    Sleep    1
+    Click Element    //div[@class="confirm"]//button[@id="confirmButton"]
+
+Sign Contract
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[contains(@class,'active')]//span[text()='Allkirjastamine']    ${TIMEOUT}
+    Sleep    1
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Allkirjastamine
+    #Click Element    //div[@class="content"]//h1
+    Click Element    //fieldset//li[3]/label[@class="label-radio"]
+    Sleep    6
+    Click Button    //button[@id="_newcontract_WAR_processportlets_signingMethodButton"]
+
+Accept Delivery
+    Wait Until Page Contains    Kohaletoimetamine    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Liitumine - Kohaletoimetamine
+    Click Element    //p/a[@class="button red small"]
+
+Verify And Select Delivery Address
+    Wait Until Page Contains    Kohaletoimetamine    ${TIMEOUT}
+    Verify Page Ostukorv - Kohaletoimetamine
+    # Step 20.
+    Click Element    //table[contains(@id,"_shoppingcart_WAR_servicesportlets")]//tr[1]/td/label[@class='label-radio']    #Action: Select First Radiobutton in Kohaletoimetamine aadress
+    Wait Until Page Contains Element    //div[@class="form-two-column clear"]//a[@class="altselect-trigger"]
+    Shopping cart - recipient details    ${susgNUM1}    ${maacEN1}    ${maacPN1}    # fill in recipient details in shoppint cart
+    Input Text    //textarea[@name="shipNotes"]    Autotest2    #Input Text "Autotest" into TextField
+    Click Element    //label[@for="_shoppingcart_WAR_servicesportlets_deliveryTerms" and @class="label-check"]    #Tick CheckBox
+    Click Element    //a[@class="button red small"]/span[contains(text(),"Salvesta")]    #Click Salvesta
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine 2

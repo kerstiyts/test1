@@ -1,0 +1,314 @@
+*** Settings ***
+Resource          ../Resources/common_resources.txt
+
+*** Variables ***
+${MAAC1}          \    # Consolidated account, business users
+${maacEN1}        \    # MAAC1 first name
+${maacPN1}        \    # MAAC1 last name
+${SUSG1}          \    # MAAC1 active mobile user
+${susgEN1}        \    # First name of mobile user SUSG1
+${susgPN1}        \    # Last name of mobile user SUSG1
+${susgNUM1}       5022206    # mobile number of user SUSG1
+${lrEN1}          Aigar    # first name of LR1
+${lrPN1}          Krier    # Last name of LR1
+${LR1}            ${lrEN1}, ${lrPN1}    # LifeRay user
+${IK1}            38211122712    # security code of LR1 - 47909040268
+${PAK_INT1}       \    # packet without fixed monthly fee, EMT Internet enabled, eg EMT kodu/ -Ärinternet
+${AutoEN1}        FirstName1    # Used in \ Fill In Page Liitumine - Andmed
+${AutoPN1}        LastName1    # Used in \ Fill In Page Liitumine - Andmed
+${PAK}            EMT Kodu-/Äriinternet
+${extraService}    EMT Internet
+${deliveryConfirmationText}    Sinu tellimus on edastatud ja pakk toimetatakse Sulle kulleriga.
+
+*** Keywords ***
+Verify Page Consolidated Dashboard
+    Wait Until Page Contains Element    //div[@id='layout-column_column-1']/div[1]//div[@class='section-header']/h2    ${TIMEOUT}
+    Page Should Contain Element    //div[@id='p_p_id_billinfo_WAR_dashboardportlets_']    # Arveldused portlet
+    Page Should Contain Element    //div[@id='_contractsmaac_WAR_dashboardportlets_ajaxWrapper']    # Leping portlet
+    Page Should Contain Element    //div[@id='_clientdata_WAR_dashboardportlets_']    # Kliendi andmed portlet
+    Page Should Contain Element    //div[@id='article_id_17701687_header']    # Teenused portlet
+    Page Should Contain Element    //div[@id='p_p_id_representativesnew_WAR_dashboardportlets_']    # Kasutajate \õigused
+    Page Should Contain Element    //div[@id='p_p_id_infophonepassword_WAR_dashboardportlets_']    # Infotelefoni salasona
+
+Verify Page Liitumine - Andmed
+    [Documentation]    New Subscription: input data
+    Wait Until Page Contains    Andmed    ${TIMEOUT}
+    #Check Title
+    Wait Until Keyword Succeeds    15 sec    2 sec    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 titles
+    Element Should Contain    //div[@class='content']/h1    Andmed
+    #Element Should Contain    id=_newcontract_WAR_processportlets_subscriber    Andmete muutmine
+    #Check buttons
+    Element Should Contain    //a[@id="_newcontract_WAR_processportlets_cancelBtn"]    Tühista
+    Element Should Contain    //button[@class='button red next']    Jätka
+
+Fill In Page Liitumine - Andmed
+    [Arguments]    ${AutoEN1}    ${AutoPN1}    # First and Last name
+    Wait Until Page Contains Element    //*[@id="_newcontract_WAR_processportlets__forename"]    ${TIMEOUT}
+    Sleep    1
+    Click Element    //*[@id="_newcontract_WAR_processportlets__forename"]
+    Input Text    //*[@id="_newcontract_WAR_processportlets__forename"]    ${AutoEN1}    #Sometimes textfield is not filled properly. So it's done two times
+    Input Text    //*[@id="_newcontract_WAR_processportlets__forename"]    ${AutoEN1}
+    Input Text    //*[@id="_newcontract_WAR_processportlets__surname"]    ${AutoPN1}
+    Input Text    //*[@id="_newcontract_WAR_processportlets__surname"]    ${AutoPN1}
+    Input Text    //*[@id="_newcontract_WAR_processportlets__email"]    ${AutoEN1}.${AutoPN1}.autotest@emt.ee
+    Input Text    //*[@id="birthdate"]    20.1.1988
+    Click Link    //a[@id="select-_newcontract_WAR_processportlets__post"]
+    Sleep    3
+    Click Link    //ul[@class="altselect"]//li[2]/a
+    #Click Link    spetsialist
+    #Click Link    //*[@id="select-_newcontract_WAR_processportlets__sector"] # Deprecated
+    #Click Link    turundus
+    Click Link    //*[@id="select-_newcontract_WAR_processportlets__language"]
+    Sleep    3
+    Click Link    //ul[@class="altselect"]//li[2]/a
+    #Click Link    Eesti
+    Click Link    //a[@id="select-_newcontract_WAR_processportlets__gender"]
+    Sleep    1
+    Click Link    Mees
+    #Select Checkbox    publishData    #//input[@id="_newcontract_WAR_processportlets_publishData"]
+    #Select Checkbox    showOnInvoice    #//input[@id="_newcontract_WAR_processportlets_showOnInvoice"]
+    Click Element    //label[@for="_newcontract_WAR_processportlets_publishData" and @class='label-check']
+    Click Element    //label[@for="_newcontract_WAR_processportlets_showOnInvoice" and @class='label-check']
+    #Sleep    2
+    #Click Button Jätka
+    Click Button    //button[@class='button red next']
+
+Verify Page Liitumine - Paketid
+    [Documentation]    New Subscription: Package
+    Wait Until Page Contains    EMT Kodu    ${TIMEOUT}
+    #Check Titles
+    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 title
+    Element Should Contain    //div[@class='content']/h1    Paketid
+    #Check accordions. What are allowed packages?
+    #Page Should Contain Element    //a[contains(text(),'MinuEMT')]
+    Page Should Contain Element    //a[contains(text(),'${PAK}')]
+    #Page Should Contain Element    //a[contains(text(),'MeieEMT')]
+    #Page Should Contain Element    //a[contains(text(),'Noova')]
+    #Page Should Contain Element    //a[contains(text(),'Süle- ja tahvelarvutipakett')]
+    #Check buttons
+    Element Should Contain    //button[@id="_newcontract_WAR_processportlets_backButtonLower"]    Tagasi
+    Element Should Contain    //a[@id="_newcontract_WAR_processportlets_cancelBtn"]    Tühista
+
+Verify Page Liitumine - Interneti paketi valik
+    Wait Until Page Contains    EMT Interneti paketi valik    ${TIMEOUT}
+    #Check Titles
+    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Pakett:\n${PAK}
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check slider
+    Element Should Contain    //div[@class='ui-slider-title']    Internet
+    Page Should Contain Element    id=_newcontract_WAR_processportlets_CHGGP-null-slider
+    #Check buttons
+    Element Should Contain    //button[@id="_newcontract_WAR_processportlets_backButtonLower"]    Tagasi
+    Element Should Contain    //a[@id="_newcontract_WAR_processportlets_cancelBtn"]    Tühista
+    Element Should Contain    //button[@class='button red next']    Jätka
+
+Verify Page Liitumine - Leping
+    [Documentation]    New Subscription: Contract
+    Wait Until Page Contains    Üldsätted    ${TIMEOUT}
+    #Check Titles
+    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 title
+    Element Should Contain    //div[@class='content']/h1    Leping
+    #Check sidebar
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${NewMobileNumber}\nPakett:\n${PAK}\nLisateenused:\n${extraService}
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check checkbox
+    Page Should Contain Element    //input[@id='_newcontract_WAR_processportlets_termsForm.agree']
+    Element Should Contain    //label[@for='_newcontract_WAR_processportlets_termsForm.agree'][2]    Kinnitan, et tutvusin tingimustega ja nõustun nendega.
+    #Check buttons
+    Element Should Contain    //button[@id="_newcontract_WAR_processportlets_backButtonLower"]    Tagasi
+    Element Should Contain    //a[@id="_newcontract_WAR_processportlets_cancelBtn"]    Tühista
+
+Verify Page Liitumine - Numbrivalik
+    [Documentation]    New subscription: Select number
+    Wait Until Page Contains    Numbrivalik    ${TIMEOUT}
+    #Check Title
+    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 titles
+    Element Should Contain    //div[@class='content']/h1    Numbrivalik
+    #Check accordions
+    #Page Should Contain Element    //a[contains(text(),'Broneeritud numbrid')]
+    #Page Should Contain Element    //a[contains(text(),'Liitumine olemasoleva numbriga')]
+    Page Should Contain Element    //a[contains(text(),'Koosta ise oma number')]
+    Page Should Contain Element    //a[contains(text(),'Kõik vabad numbrid')]
+    Page Should Contain Element    //a[contains(text(),'Liitumine kõnekaardi numbriga')]
+    Element Should Contain    //button[@id="_newcontract_WAR_processportlets_backButtonLower"]    Tagasi
+    Element Should Contain    //a[@id="_newcontract_WAR_processportlets_cancelBtn"]    Tühista
+
+Liitumine_Koik vabad numbrid
+    Wait Until Keyword Succeeds    60    2    Click Element    //div[@id="_newcontract_WAR_processportlets_number"]//a[text()= 'Kõik vabad numbrid']
+    Comment    Click Element    xpath=//div[@id="_newcontract_WAR_processportlets_number"]//a[contains(text(), 'Kõik vabad numbrid')]
+    #Step 13
+    #Action: Choose first number
+    Wait Until Page Contains Element    //form[@id="_newcontract_WAR_processportlets_freeNumberForm"]//tr[1]/td[1]//span    ${TIMEOUT}
+    Sleep    1
+    Click Element    //form[@id="_newcontract_WAR_processportlets_freeNumberForm"]//tr[1]/td[1]/label[@class="label-radio"]
+    ${res}=    Get Element Attribute    //form[@id="_newcontract_WAR_processportlets_freeNumberForm"]//tr[1]/td[1]/label[@class="label-radio r-on"]//input@value
+    Set Test Variable    ${NewMobileNumber}    ${res}
+    Comment    Mouse Over    //form[@id="_newcontract_WAR_processportlets_freeNumberForm"]//tr[1]/td[1]//span
+    Comment    Mouse Down    //form[@id="_newcontract_WAR_processportlets_freeNumberForm"]//tr[1]/td[1]//span
+    Comment    Mouse Up    //form[@id="_newcontract_WAR_processportlets_freeNumberForm"]//tr[1]/td[1]//span
+
+Liitumine_Koosta ise oma number
+    Wait Until Keyword Succeeds    60    2    Click Element    //div[@id="_newcontract_WAR_processportlets_number"]//a[text()= 'Koosta ise oma number']
+    Comment    Click Element    xpath=//div[@id="_newcontract_WAR_processportlets_number"]//a[contains(text(), 'Kõik vabad numbrid')]
+    Click Element    xpath=//button[@class="button red next"]/span[text()='Otsi']
+    Wait Until Page Contains Element    //form[@id="_newcontract_WAR_processportlets_paidNumbersForm"]    ${TIMEOUT}
+    #Step 13
+    #Action: Choose first number
+    Wait Until Page Contains Element    //form[@id="_newcontract_WAR_processportlets_paidNumbersForm"]//tr[1]/td[1]//span    ${TIMEOUT}
+    Click Element    //form[@id="_newcontract_WAR_processportlets_paidNumbersForm"]//tr[1]/td[1]//span
+
+Verify Page Liitumine - Allkirjastamine
+    [Documentation]    New Subscription: Sign contract
+    #Check Titles
+    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 title
+    Element Should Contain    //div[@id='_newcontract_WAR_processportlets_signingContainer']//h1    Allkirjastamine
+    #Check sidebar
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${NewMobileNumber}\nPakett:\n${PAK}\nLisateenused:\n${extraService}
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check buttons
+    Element Should Contain    //button[@id="_newcontract_WAR_processportlets_signingMethodButton"]    Jätka
+
+Verify Page Liitumine - Kohaletoimetamine
+    #Check Titles
+    Element Should Contain    //div[@class='title']    Liitumine
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 title
+    Element Should Contain    //div[@class='modalbox-content']/h1    Kohaletoimetamine
+    #Check p text
+    Element Should Contain    //div[@class='modalbox-content']/p    Järgnevalt palume määrata kohaletoimetamisega seotud info
+    #Check sidebar
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${NewMobileNumber}\nPakett:\n${PAK}\nLisateenused:\n${extraService}
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check buttons
+    Element Should Contain    //a[@class='button red small']/span    Jätka
+
+Verify Page Ostukorv - Ulevaade
+    [Documentation]    Shopping chart: Overview
+    #Check Titles
+    Title Should Be    Ostukorv - EMT
+    Element Should Contain    //div[@class='title']    Ostukorv
+    #Check Tabs
+    Page Should Contain Element    //div[@class="tabbed-menu-tabs"]
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[1]/a
+    Should Match Regexp    ${tab}    Tarnesse saatmine \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[2]/a
+    Should Match Regexp    ${tab}    Kinnitamata tellimused \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[3]/a
+    Should Match Regexp    ${tab}    Pooleliolevad tellimused \\(\\d+\\)
+    #Check buttons
+    Element Should Contain    //a[@class="button red small"]    Jätka
+    Element Should Contain    //div[@class="tabbed-box-container"]//a[@class="button white small"]    Tellimuste ajalugu
+    Element Should Contain    //a[@class="button white cancel "]    Katkesta
+    # Verify Shopping chart overview
+    Element Should Contain    //*[@id="_shoppingcart_WAR_servicesportlets_deliverySummary"]/div/dl[1]/dt    Toodete maksumus kokku:
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[1]/dd    0 €
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[2]/dt    Käibemaks 20%:
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[2]/dd    0 €
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[3]/dt    Postikulud:
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[3]/dd    0 €
+    \    #Verify Shoppinf chart content acordion
+    Element Should Contain    //*[@id='_shoppingcart_WAR_servicesportlets_deliveryForm']//table/tbody/tr[1]/th/a    Liitumine
+    Element Should Contain    //*[@id='_shoppingcart_WAR_servicesportlets_deliveryForm']//table/tbody/tr[1]/td[1]    ${AutoEN1} ${AutoPN1}
+    Element Should Contain    //*[@id='_shoppingcart_WAR_servicesportlets_deliveryForm']//table/tbody/tr[1]/td[2]/a    PDF
+    Element Should Contain    //*[@id='_shoppingcart_WAR_servicesportlets_deliveryForm']//table/tbody/tr[1]/td[3]/a    Allkirjasta
+    Page Should Contain Element    //*[@id='_shoppingcart_WAR_servicesportlets_deliveryForm']//table/tbody/tr[1]/td[4]//label[@class="label-check c-on"]    # Checked checkbox
+    Page Should Contain Element    //*[@id='_shoppingcart_WAR_servicesportlets_deliveryForm']//table/tbody/tr[1]/td[5]/a[@class="ico-remove"]    # Removal icon X
+    Verify Sidebar LoggedIn
+    #Verify Ostukorv
+    ${ostukorv}=    Get Text    //a[@id="shoppingCartLink"]
+    Should Match Regexp    ${ostukorv}    .*Ostukorv.*\\(\\d+\\).*
+
+Verify Page Ostukorv - Kohaletoimetamine
+    [Documentation]    Shopping chart: Delivery
+    ...    Page 1
+    #Check Titles
+    Title Should Be    Ostukorv - EMT
+    Element Should Contain    //div[@class='title']    Ostukorv
+    #Check Tabs
+    Page Should Contain Element    //div[@class="tabbed-menu-tabs"]
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[1]/a
+    Should Match Regexp    ${tab}    Tarnesse saatmine \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[2]/a
+    Should Match Regexp    ${tab}    Kinnitamata tellimused \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[3]/a
+    Should Match Regexp    ${tab}    Pooleliolevad tellimused \\(\\d+\\)
+    #Check Form : Kohaletoimetamine
+    #Page Should Contain Element    //div[@id="_shoppingcart_WAR_servicesportlets_deliveryTypeCourier"]//label[@for="_shoppingcart_WAR_servicesportlets_deliveryTypeCourier"]    Kuller
+    #Page Should Contain Element    //label[@for="_shoppingcart_WAR_servicesportlets_deliveryTypeCourier"]/text()='Kuller'
+    Page Should Contain    Kuller
+    #    //form[@id="_shoppingcart_WAR_servicesportlets_changeDeliveryTypeForm"]
+    Page Should Contain Element    //input[@id="_shoppingcart_WAR_servicesportlets_deliveryTypeCourier" and @checked="checked"]    #Kuller is selected
+    \    #Deleivery address MAAC1. Can't be tested yet
+    Element Should Contain    //div[@class="expand-box"]/p/a    Määra uus aadress
+    Element Should Contain    //span[@id="clientName"]    ${maacEN1} ${maacPN1}    #first and las name
+    #Page Should Contain Element    //input[@id="contactPhone" and @value='${susgNUM1}']
+    Page Should Contain Element    //a[@id="select-deliveryTimes"]    #Kättetoimetamise aeg
+    #Page Should Contain Element    //div[@class="form-two-column clear"]//span[@class="field-title"]/text()="Märkused:"    #Textfield name Märkused:
+    Page Should Contain Element    //textarea[@id="_shoppingcart_WAR_servicesportlets_shipNotes"]
+    Element Should Contain    //div[@class="box-terms"]//h1    Tellimistingimused
+    Page Should Contain Element    //p[@class="agreement"]//span[@class="checkbox"]    #Checkbox
+    Element Should Contain    //label[@for="_shoppingcart_WAR_servicesportlets_deliveryTerms"][2]    Kinnitan, et tutvusin ja nõustun tingimustega
+    #Check buttons
+    Element Should Contain    //a[@class="button white back"]/span    Tagasi
+    Element Should Contain    //a[@class="button red small"]/span    Salvesta
+    # Verify Shopping chart overview
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[1]/dt    Toodete maksumus kokku:
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[1]/dd    0 €
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[2]/dt    Käibemaks 20%:
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[2]/dd    0 €
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[3]/dt    Postikulud:
+    Element Should Contain    //div[contains(@id, "shoppingcart")]//dl[3]/dd    0 €
+    Verify Sidebar LoggedIn
+
+Verify Page Ostukorv - Kohaletoimetamine 2
+    [Documentation]    Shopping chart: Delivery
+    ...    Page 2
+    #Check Titles
+    Title Should Be    Ostukorv - EMT
+    Element Should Contain    //div[@class='title']    Ostukorv
+    #Check Tabs
+    Page Should Contain Element    //div[@class="tabbed-menu-tabs"]
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[1]/a
+    Should Match Regexp    ${tab}    Tarnesse saatmine \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[2]/a
+    Should Match Regexp    ${tab}    Kinnitamata tellimused \\(\\d+\\)
+    ${tab}=    Get Text    //div[@class="tabbed-menu-tabs"]//li[3]/a
+    Should Match Regexp    ${tab}    Pooleliolevad tellimused \\(\\d+\\)
+    Element Should Contain    //div[@class="tabbed-box-container"]//div/span    ${deliveryConfirmationText}
+    Verify Sidebar LoggedIn
+
+Verify Page Tellimuste ajalugu
+    [Documentation]    Order History validation
+    #Check Titles
+    Title Should Be    Tellimuste ajalugu - EMT
+    Element Should Contain    //div[@class='title']    Tellimuste ajalugu
+    # Tee vielä Kuvatakse osio
+
+Verify Order History
+    Wait Until Page Contains    Tellimuste ajalugu    ${TIMEOUT}
+    #Verify order history
+    ${day}=    Get Time    day
+    ${month}=    Get Time    month
+    ${year}=    Get Time    year
+    ${NumberWithoutCountryCode} =    Get Substring    ${NewMobileNumber}    3
+    Page Should Contain Element    //tbody/tr[./td[contains(., '${NumberWithoutCountryCode}/${AutoEN1} ${AutoPN1}')] and ./td[contains(., '${day}.${month}.${year}')] and ./td[contains(., 'Kohaletoimetamisel')]]
+    ${order}=    Get Text    //tbody/tr[./td[contains(., '${NumberWithoutCountryCode}/${AutoEN1} ${AutoPN1}')] and ./td[contains(., '${day}.${month}.${year}')] and ./td[contains(., 'Kohaletoimetamisel')]]/td[5]

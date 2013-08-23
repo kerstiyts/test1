@@ -1,0 +1,134 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    ff    winTC3
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Test Timeout      20 minutes
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase3_resources.txt
+Library           ../Resources/OracleDB_Library.py
+
+*** Variables ***
+
+*** Test Cases ***
+TestCase3
+    [Documentation]    Test Case 3, New user needed
+    [Tags]    TestCase3    Ready
+    Find Customer
+    Precheck
+    # Step 1
+    Verify Start Page
+    # Step 2
+    Go To E-Services
+    # Step 3-5
+    Log In to E-Services Then Verify Page Content
+    # Step 6-7
+    Select Package And Continue
+    Verify Change Package Page
+    #Select Internet Package And Continue
+    #Step 8
+    Configure MinuEMT Package
+    #Verify Page Content Then Select Internet Package
+    # Step 9
+    Verify Approval Page Then Approve Changes
+    # Step 10
+    Verify Confirmation Page And Continue
+    # Step 11
+    #Sign Contract
+    Verify Shopping Cart Overview
+    # Step 12
+    Go To Order History And Verify Page Content
+    # Step 13
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Find Customer
+    Connect To Database    ${DB_USERNAME}    ${DB_PASSWORD}    ${DB_DSN}
+    ${query_results}=    Query From File    Resources/testcase3_query.txt
+    Disconnect From Database
+    Set Suite Variable    ${MAAC1_ref}    ${query_results[0][0]}
+    Set Suite Variable    ${MAAC1}    ${query_results[0][2]}
+    Set Suite Variable    ${maacEN1}    ${query_results[0][3]}
+    Set Suite Variable    ${maacPN1}    ${query_results[0][4]}
+    #Set Suite Variable    ${lrEN1}    ${query_results[0][9]}
+    #Set Suite Variable    ${lrPN1}    ${query_results[0][10]}
+    Set Suite Variable    ${susgEN1}    ${query_results[0][5]}
+    Set Suite Variable    ${susgPN1}    ${query_results[0][6]}
+    Set Suite Variable    ${IK1}    ${query_results[0][7]}
+    Set Suite Variable    ${susgNUM1}    ${query_results[0][8]}
+
+Precheck
+    Check Subscribers saldo    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC3
+
+Log In to E-Services Then Verify Page Content
+    Run Keyword And Continue On Failure    Verify LogIn Window
+    Login    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+    Run Keyword And Continue On Failure    Verify Page Mobiili Toolaud    ${susgEN1}    ${susgPN1}    ${SUSG1}    ${susgNUM1}
+
+Select Package And Continue
+    Select Package
+
+Verify Change Package Page
+    # Step 7
+    Wait Until Page Contains    Kokkuvõte    ${TIMEOUT}
+    #Check Title
+    Element Should Contain    //div[@class='title']    Paketivahetus
+    ${step}=    Get Text    //ol[@id='progress']/li[@class='active first']/span
+    Run Keyword If    '${step}' == 'Andmed'    Fill In Page Paketivahetus - Andmed
+    Run Keyword Unless    '${step}' == 'Andmed'    Verify Page Paketivahetus - Paketivalik
+
+Configure MinuEMT Package
+    #Select slider positions
+    ${Slider1}=    Get Text    //div[contains(@class, 'slider01')]//li[2]
+    Click Element    //div[contains(@class, 'slider01')]//li[2]
+    ${Slider2}=    Get Text    //div[contains(@class, 'slider02')]//li[2]
+    Click Element    //div[contains(@class, 'slider02')]//li[2]
+    ${Slider3}=    Get Text    //div[contains(@class, 'slider03')]//li[2]
+    Click Element    //div[contains(@class, 'slider03')]//li[2]
+    Sleep    5
+    Wait Until Page Contains Element    //span[@class='slider01-value' and contains(text(), '${Slider2}')]    ${TIMEOUT}
+    #Check summary
+    # Element Should Contain    //span[@class='slider01-total']    ${Slider1}
+    # Element Should Contain    //span[@class='slider02-total']    ${Slider2}
+    # Element Should Contain    //span[@class='slider03-total']    ${Slider3}
+    Element Should Contain    //span[@class='slider01-value']    ${Slider2}
+    Element Should Contain    //span[@class='slider02-value']    ${Slider3}
+    # Element Should Contain    //span[@class='slider03-value']    ${Slider3}
+    #Continue
+    Click Button    //button[@class='button red next']    #Click Jätka
+    Set Test Variable    ${Slider1}
+    Set Test Variable    ${Slider2}
+    Set Test Variable    ${Slider3}
+
+Verify Page Content Then Select Internet Package
+    Run Keyword And Continue On Failure    Verify Page Paketivahetus - Interneti valik
+    # Step 9
+    # Click Element    //li/span[text()='4G (+240min+25sms)']    # Select last position on the slider
+    # Wait Until Keyword Succeeds    ${TIMEOUT}    2    Element Should Contain    //div[@class="groupitem calculator-data"]//span[@class="slider03-total"]    4G (+240min+25sms)
+    Click Button    //button[@class='button red next']    #Click Jätka
+
+Verify Approval Page Then Approve Changes
+    Run Keyword And Continue On Failure    Verify Page Paketivahetus - Kinnitamine
+    Click Link    id=_packagechange_WAR_processportlets_confirmBtn
+    Sleep    3
+    Click Button    id=confirmButton
+
+Verify Confirmation Page And Continue
+    Run Keyword And Continue On Failure    Verify Page Paketivahetus - Ostukorv
+    # Step 11
+    #Click Jätka
+    Click Element    //a[@class='button red small']
+
+Verify Shopping Cart Overview
+    Run Keyword And Continue On Failure    Verify Shopping Cart
+
+Go To Order History And Verify Page Content
+    Click Element    //div[@id='tab-1']//a[@class='button white small']    #Click Button Tellimuste ajalugu
+    Verify Order History
+
+Sign Contract
+    Verify Page Liitumine - Allkirjastamine
+    #Click Element    //div[@class="content"]//h1
+    #Click Element    //fieldset//li[3]/label[@class="label-radio"]
+    Click Element    //label[@class="label-radio" and @for="_packagechange_WAR_processportlets_parcel_sign"]
+    Click Button    //button[@id="_packagechange_WAR_processportlets_signingMethodButton"]

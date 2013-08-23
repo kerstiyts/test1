@@ -1,0 +1,106 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Test Timeout      10 minutes
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase9_resources.txt
+
+*** Test Cases ***
+TestCase9
+    [Documentation]    Test Case 9, New user needed
+    [Tags]    TestCase9
+    # Step 1
+    Verify Start Page
+    # Step 2 - 5
+    Log In to E-Services And Verify Page Content
+    # Step 6
+    Go To Offer Page And Verify Page Content
+    # Step 7
+    Select Offer And Verify Offer Details Page
+    # Step 8
+    Choose Package
+    # Step 9
+    Choose Internet
+    # Steps 10 -11 not in AUT
+    # Step 12
+    Confirm Package
+    # Step 13
+    Sign Contract
+    # Step 14
+    Verify Order
+    # Step 15
+    Shopping Cart Overview
+    # Step 16
+    Proceed To Shipping Options
+    # Step 17
+    Fill In Shipping Options And Place Order
+    # Step 18
+    Verify Order In Order History
+    Log Out    ${lrEN1}    ${lrPN1}
+
+*** Keywords ***
+Log In to E-Services And Verify Page Content
+    Go To E-Services
+    Run Keyword And Continue On Failure    Verify LogIn Window
+    Login    ${IK1}    ${lrEN1}    ${lrPN1}
+    Run Keyword And Continue On Failure    Verify Page Mobiili Toolaud    ${susgEN1}    ${susgPN1}    ${MAAC1}    ${susgNUM1}
+
+Go To Offer Page And Verify Page Content
+    Go To Offer Page
+    Run Keyword And Continue On Failure    Verify Offer Page
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Select Offer And Verify Offer Details Page
+    Select Offer    ${OFFER}
+    Run Keyword And Continue On Failure    Verify Offer Details Page
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Choose Package
+    Click Button Vormista oma numbrile
+    Run Keyword And Continue On Failure    Verify Modal Window Paketivalik
+
+Choose Internet
+    Click Button    //button[@class="button red next"]
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[@class="active"]/span[text()="Interneti valik"]    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Modal Window Internetivalik
+
+Confirm Package
+    Click Button    //div[@class="modalbox-container"]//button[@class="button red next"]
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[@class="active"]/span[text()="Kinnitamine"]    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Modal Window Kinnitamine
+
+Sign Contract
+    Click Element    //label[@class="label-check" and @for="_packagechange_WAR_processportlets_agreed"]
+    Click Element    //div[@class="modalbox-container"]//a[@class="button red small"]
+    Wait Until Page Contains Element    //button[@class="button white pass"]    ${TIMEOUT}
+    Click Button    //button[@class="button white pass"]
+    Wait Until Page Contains Element    //h1[text()="Allkirjastamine"]    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Modal Window Allkirjastamine
+
+Verify Order
+    #Click Element    //label[@class="label-radio r-on" and @for="_packagechange_WAR_processportlets_parcel_sign"]    #Select radio button 'Allkirjastan kulleriga toodud lepingu’
+    Click Element    //fieldset//li[3]/label[@class="label-radio"]    #Select radio button 'Allkirjastan kulleriga toodud lepingu’
+    Click Button    //button[@class="button red small"]    # Click Jätka
+    Wait Until Page Contains Element    //ol[@id="progress"]//li[@class="active last"]/span[contains(text(),"Ostukorv")]    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Modal Window Ostukorv
+
+Shopping Cart Overview
+    Click Element    //a[@class="button red small"]
+    Run Keyword And Continue On Failure    Click Link    Tarnesse saatmine (1)    # Extra step
+    Run Keyword And Continue On Failure    Verify Page Ostukorv
+
+Proceed To Shipping Options
+    Click Link    //div[@class='buttons']/a[@class='button red small']    #Click Button Jätka
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Click Button    confirmButton    #Click button Jah
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine
+
+Fill In Shipping Options And Place Order
+    Fill In Shipping Options
+    Run Keyword And Continue On Failure    Check That Order Was Succesfull - case 9
+
+Verify Order In Order History
+    Go To Order History
+    Run Keyword And Continue On Failure    Verify Order History
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn

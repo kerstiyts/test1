@@ -1,0 +1,205 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    chrome    winTC4
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Test Timeout      15 minutes
+Resource          ../Resources/testcase4_resources.txt
+Resource          ../Resources/common_resources.txt
+Library           ../Resources/OracleDB_Library.py
+
+*** Variables ***
+
+*** Test Cases ***
+TestCase4
+    [Documentation]    Test Case 4, NewUser needed because sales limit will exeed in some point
+    [Tags]    TestCase4    Ready
+    Find Customer
+    Precheck
+    # Step 1
+    Verify Start Page
+    # Step 2
+    Go To Web Shop
+    Verify Web Shop Page When Logged Out
+    # Step 3
+    Go To Product Categories
+    # Step 4
+    Select Product
+    # Step 5
+    Select Product With Package
+    # Step 6
+    Verify Login Window
+    # Step 7 -8
+    Login    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}
+    #Extra step
+    Close Extra Modal Window
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+    Close Extra Modal Window
+    #Step 9    SKIP!!!
+    Verify Sidebar LoggedIn
+    #Step 10
+    Select Product Without Package
+    #Step 11
+    Select Installment Payment
+    #step 12 - 14
+    Set Monthly Installments
+    #step 15
+    Verify Installment Plan And Continue
+    #Step 16
+    Verify And Accept Terms
+    #Step 17
+    Verify Shopping Cart
+    #Step 18
+    Proceed To Shipping Options
+    #Step 19
+    Fill In Shipping Options And Place Order
+    #Step 20 - 21
+    Pay Product
+    Check That Order Was Succesfull - No tabs
+    #Step 22
+    Verify Order In Order History
+    Log Out    ${maacEN1}    ${maacPN1}
+
+*** Keywords ***
+Find Customer
+    Connect To Database    ${DB_USERNAME}    ${DB_PASSWORD}    ${DB_DSN}
+    ${query_results}=    Query From File    Resources/testcase4_query.txt
+    Disconnect From Database
+    Set Suite Variable    ${MAAC1_ref}    ${query_results[0][0]}
+    Set Suite Variable    ${MAAC1}    ${query_results[0][2]}
+    Set Suite Variable    ${maacEN1}    ${query_results[0][3]}
+    Set Suite Variable    ${maacPN1}    ${query_results[0][4]}
+    #Set Suite Variable    ${lrEN1}    ${query_results[0][8]}
+    #Set Suite Variable    ${lrPN1}    ${query_results[0][9]}
+    Set Suite Variable    ${susgEN1}    ${query_results[0][5]}
+    Set Suite Variable    ${susgPN1}    ${query_results[0][6]}
+    Set Suite Variable    ${IK1}    ${query_results[0][7]}
+    Set Suite Variable    ${susgNUM1}    ${query_results[0][8]}
+
+Precheck
+    Check Subscribers saldo    ${IK1}    ${maacEN1}    ${maacPN1}    ${MAAC1}    ${MAAC1_ref}    winTC4
+
+Verify Web Shop Page When Logged Out
+    Run Keyword And Continue On Failure    Verify Page E-pood
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedOut
+
+Go To Product Categories
+    Click Link    Tahvelarvutid
+    Run Keyword And Continue On Failure    Verify Page Tahvelarvutid
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedOut
+
+Select Product
+    Search For Device    ${COMP1}    ${KOOD1}
+    Wait Until Page Contains Element    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    ${TIMEOUT}
+    Sleep    1
+    Click Link    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    #Click Vaata button
+    Wait Until Page Contains Element    id=_eshop_WAR_eshopportletnew_mipaCalculatorContainer    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Vaata Logged In
+    Verify Sidebar LoggedOut
+
+Select Product With Package
+    Click Link    id=_eshop_WAR_eshopportletnew_startPakProcess    #Vali
+    Sleep    10
+
+Close Extra Modal Window
+    ${modal_status}    ${value} =    Run Keyword And Ignore Error    Check Modal Window
+    Run Keyword If    '${modal_status}'=='PASS'    Click Link    //a[@id="modalclose"]    #Close modal window
+
+Check Modal Window
+    Wait Until Keyword Succeeds    10 sec    2    Page Should Contain Element    //a[@id="modalclose"]
+
+Select Product Without Package
+    Click Element    //div[@class="product-details clear"]//div[@class="product-prices alt clear"]//p[@class="action"]//a[@id="_eshop_WAR_eshopportletnew_productLeasingButton1"]    #Click Osta
+    Run Keyword And Continue On Failure    Verify Payment Options Modal Window
+
+Select Installment Payment
+    Click Element    //a[@class='button closeModal']
+    Sleep    2
+    Wait Until Page Contains Element    //h1[contains(text(), 'Kuumaksu määramine')]    ${TIMEOUT}
+    #Verify Sidebar
+    Element Should Contain    //div[@class="title"]    Ostmine järelmaksuga
+    Element Should Contain    //h2[@class='alt']    Valitud tooted
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="product-title"]    ${COMP1}\n${NAME1}
+    #Verify Progress bar
+    Element Should Contain    //div[@class="modalbox-container"]//li[@class="active first"]    Kuumaksu määramine
+    Element Should Contain    //div[@class="modalbox-container"]//li[@class="last"]    Teabeleht
+    #Verify form
+    Element Should Contain    //form[@id="_leasing_WAR_eshopportletnew_processForm"]//div[@class="content"]/h1    Kuumaksu määramine
+    #Check buttons
+    Element Should Contain    //a[@id='_leasing_WAR_eshopportletnew_cancelBtn']    Tühista
+    Element Should Contain    //button[@id='_leasing_WAR_eshopportletnew_saveButton']    Jätka
+
+Set Monthly Installments
+    Verify Modal Window Kuumaksu määramine
+    Fill In Invalid Amount
+
+Verify Installment Plan
+    Click Link    //div[@class="expand-box"]//a[@class="expand-title-r"]    #Maksegraafik
+    Sleep    5
+    Comment    Maksegraafik header row
+    Element Should Contain    //div[@id='ex01']/table[@class='thead']/tbody/tr/th[1]    Maksetähtaeg
+    Element Should Contain    //div[@id='ex01']/table[@class='thead']/tbody/tr/th[2]    Jääkmaksumus
+    Element Should Contain    //div[@id='ex01']/table[@class='thead']/tbody/tr/th[3]    Järelmaksu osamakse
+    Element Should Contain    //div[@id='ex01']/table[@class='thead']/tbody/tr/th[4]    Intressi summa
+    Element Should Contain    //div[@id='ex01']/table[@class='thead']/tbody/tr/th[5]    Osamaksed
+    Comment    Maksegraafik footer row
+    Element Should Contain    //div[@id='ex01']/table[@class='tfoot']//tr/th[1]    Kokku
+    Element Should Contain    //div[@id='ex01']/table[@class='tfoot']//tr/th[3]    EUR
+    Element Should Contain    //div[@id='ex01']/table[@class='tfoot']//tr/th[4]    EUR
+    Element Should Contain    //div[@id='ex01']/table[@class='tfoot']//tr/th[4]    EUR
+
+Verify Terms
+    Wait Until Page Contains Element    //h1[contains(text(), 'Teabeleht')]    ${TIMEOUT}
+    Element Should Contain    //div[@class="title"]    Ostmine järelmaksuga
+    Element Should Contain    //div[@class="modalbox-container"]//li[@class="visited first"]    Kuumaksu määramine
+    Element Should Contain    //div[@class="modalbox-container"]//li[@class="active last"]    Teabeleht
+    Element Should Contain    //div[@class="content"]/h1    Teabeleht
+    Element Should Contain    //div[@class="content"]/p    Palun kinnita, et oled tutvunud teabelehega.
+    Element Should Contain    //div[@class="box-terms"]//div[@class="content"]/h2    EUROOPA TARBIJAKREDIIDI STANDARDINFO TEABELEHT
+    #Check sidebar
+    Element Should Contain    //div[@class='account box']/h2[@class='alt'][1]    Kokkuvõte
+    ${res}=    Get Text    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[1]
+    Should Be Equal    ${res}    Järelmaksu periood:\n12 kuud
+    ${res}=    Get Text    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[2]
+    Should Match Regexp    ${res}    Sissemakse:\n.+€
+    ${res}=    Get Text    //div[@class="modalbox-sidebar"]//div[@class="selection"]/p[3]
+    Should Match Regexp    ${res}    Kuumakse:\n.+€
+    Element Should Contain    //div[@class='account box']/h2[@class='alt'][2]    Valitud tooted
+    Element Should Contain    //div[@class="modalbox-sidebar"]//div[@class="product-title"]    ${COMP1}\n${NAME1}
+    #Check buttons
+    Element Should Contain    //a[@id="_leasing_WAR_eshopportletnew_cancelBtn"]    Tühista
+    Element Should Contain    //button[@id="_leasing_WAR_eshopportletnew_backButton"]    Tagasi
+    Element Should Contain    //button[@id="_leasing_WAR_eshopportletnew_saveButton"]    Kinnita
+
+Verify Shopping Cart
+    Run Keyword And Continue On Failure    Verify Page Ostukorv
+
+Verify Installment Plan And Continue
+    Run Keyword And Continue On Failure    Verify Installment Plan
+    #Input Text    id=_leasing_WAR_eshopportletnew_downPayment    30.00    #Remove if steps 12-14 are added back.
+    #Click Button    id=_leasing_WAR_eshopportletnew_saveButton    #Remove if steps 12-14 are added back.
+    #Wait Until Page Contains Element    //button[@class='button red small' and @id='_leasing_WAR_eshopportletnew_saveButton']    ${TIMEOUT}    #Remove if steps 12-14 are added back.
+    Click Button    id=_leasing_WAR_eshopportletnew_saveButton
+
+Proceed To Shipping Options
+    Click Link    //div[@class='buttons']/a[@class='button red small']    #Click Button Jätka
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Click Button    confirmButton    #Click button Jah
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Fill In Shipping Options And Place Order
+    Fill In Shipping Options
+    Run Keyword And Continue On Failure    Verify Shopping Cart With Paying Options
+
+Pay Product
+    #Pay Products Via Nordea Mock
+    Pay Products Via Generic Mock Swedbank
+
+Verify Order In Order History
+    Go To Order History
+    Verify Order History
+
+Verify And Accept Terms
+    Run Keyword And Continue On Failure    Verify Terms
+    Select Checkbox    id=_leasing_WAR_eshopportletnew_i09
+    Click Button    id=_leasing_WAR_eshopportletnew_saveButton

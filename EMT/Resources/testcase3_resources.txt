@@ -1,0 +1,174 @@
+*** Settings ***
+Resource          common_resources.txt
+
+*** Variables ***
+${lrEN1}          Liia
+${lrPN1}          Laid
+${maacEN1}        Liia
+${maacPN1}        Laid
+${IK1}            46004030405
+${MAAC1}          Laid, Liia
+${susgEN1}        LIIA
+${susgPN1}        LAID
+${SUSG1}          ${susgEN1} ${susgPN1}
+${susgNUM1}       5279992
+${PAK_1}          MinuEMT
+${PAK_2}          MinuEMT
+
+*** Keywords ***
+Verify Page Paketivahetus - Paketivalik
+    Wait Until Page Contains    Pane kokku oma isiklik pakett    ${TIMEOUT}
+    #Check Title
+    Element Should Contain    //div[@class='title']    Paketivahetus
+    #Sliders
+    Page Should Contain Element    //div[@class='ui-slider-title' and contains(text(), 'Kõned (min)')]
+    Page Should Contain Element    //div[@class='ui-slider-title' and contains(text(), 'Sõnumid (tk)')]
+    Page Should Contain Element    //div[@class='ui-slider-title' and contains(text(), 'Internet')]
+    #Slider totals
+    Element Should Contain    //span[@class='slider01-total']/../..    Kõned\n0 min
+    Element Should Contain    //span[@class='slider02-total']/../..    Sõnumid\n0 tk
+    #Element Should Contain    //span[@class='slider03-total']/../..    Internet\n0 MB -- not sure if worth checking here
+    Element Should Contain    //span[@class='slider01-value']/../..    Valitud maht:\n0 min
+    Element Should Contain    //span[@class='slider02-value']/../..    Valitud maht:\n0 tk
+    #Element Should Contain    //span[@class='slider03-value']/../..    Valitud maht:\n0 -- not sure if worth checking here
+    #Info text
+    Page Should Contain    Hinnad on toodud käibemaksuga
+    #Totals
+    Element Should Contain    //div[@class='total clear']/dl[@class='clear']/dt    MinuEMT tasu:
+    Element Should Contain    //div[@class='total clear']/dl[@class='clear']/dd    €/kuu
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${susgNUM1}
+    #Check buttons
+    Element Should Contain    id=_packagechange_WAR_processportlets_cancelBtn    Tühista
+    #Element Should Contain    id=_packagechange_WAR_processportlets_backButtonLower    Tagasi - it is deprecated
+    Element Should Contain    //button[@class='button red next']    Jätka
+
+Verify Page Paketivahetus - Interneti valik
+    Wait Until Page Contains    EMT Interneti paketi valik    ${TIMEOUT}
+    #Check Title
+    Element Should Contain    //div[@class='title']    Paketivahetus
+    #Chech H1 title
+    Element Should Contain    //div[@class='content']/h1    EMT Interneti paketi valik
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${susgNUM1}\nPakett:\n${NewPackage}
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Teenustasud kokku:
+    #Check slider
+    Element Should Contain    //div[@class='ui-slider-title']    Internet (maht/kiirus)\nMaht:\nKiirus:
+    Page Should Contain Element    id=calculator
+    #Check buttons
+    Element Should Contain    id=_packagechange_WAR_processportlets_cancelBtn    Tühista
+    #Element Should Contain    id=_packagechange_WAR_processportlets_backButtonLower    Tagasi
+    Element Should Contain    //button[@class='button red next']    Jätka
+
+Verify Page Paketivahetus - Kinnitamine
+    Wait Until Page Contains Element    id=_packagechange_WAR_processportlets_confirmBtn    ${TIMEOUT}
+    #Check Title
+    Element Should Contain    //div[@class='title']    Paketivahetus
+    #Chech H1 title
+    Element Should Contain    //div[@class='content']/h1    Kinnitamine
+    #Text
+    Page Should Contain    Paketivahetuse kinnitamiseks vajuta \"Kinnita\" nuppu.
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${susgNUM1}\nPakett:\n${NewPackage}\nTeenuste mahud:\n
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check buttons
+    Element Should Contain    id=_packagechange_WAR_processportlets_cancelBtn    Tühista
+    Element Should Contain    id=_packagechange_WAR_processportlets_backButtonLower    Tagasi
+    Element Should Contain    id=_packagechange_WAR_processportlets_confirmBtn    Kinnita
+
+Verify Page Paketivahetus - Ostukorv
+    Wait Until Page Contains    Paketivahetuse taotlus on kinnitatud.    ${TIMEOUT}
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${susgNUM1}\nPakett:\n${NewPackage}\nTeenuste mahud:\n
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check buttons
+    Element Should Contain    //button[@id="_packagechange_WAR_processportlets_closeButton"]    Sulge
+    Element Should Contain    //a[@class='button red small']    Jätka
+
+Verify Shopping Cart
+    [Documentation]    Verifys the shopping basket page.
+    #Wait for the page to load
+    Wait Until Page Contains Element    //div[@class='title']/h1[text()='Ostukorv']    ${TIMEOUT}
+    #Verify tabs
+    Page Should Contain Link    //a[contains(@title, "Tarnesse saatmine")]
+    Page Should Contain Link    //a[contains(@title, "Kinnitamata tellimused")]
+    Page Should Contain Link    //a[contains(@title, "Pooleliolevad tellimused")]
+    #Verify button
+    Element Should Contain    //div[@id='tab-1']//a[@class='button white small']    Tellimuste ajalugu
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Verify Order History
+    #Wait for the page to load
+    Wait Until Page Contains    Tehingu liik    ${TIMEOUT}
+    # Title
+    Page Should Contain Element    //h1[contains(text(), "Tellimuste ajalugu")]
+    #Verify order history
+    ${all_rows}=    Get Matching Xpath Count    //table[contains(@id, '_shoppingcarthistory_')]//tr
+    ${prelast_row}=    Evaluate    ${all_rows}-1
+    ${latest_row}=    Evaluate    ${all_rows}- ${prelast_row}
+    #Get Table Cell    //table[@class='']    ${rows}    1    DOESN'T WORK
+    #Table Cell Should Contain    //table[@class='']    ${rows}    1    Lepingu muutmine    DOESN'T WORK
+    Element Should Contain    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${latest_row}]/td[1]    Lepingu muutmine
+    Element Should Contain    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${latest_row}]/td[2]    ${susgNUM1}/${susgEN1} ${susgPN1}
+    ${status}=    Get Text    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${latest_row}]/td[4]
+    Should Match Regexp    ${status}    Suunatud teostamisse|Teostamisel|Teostatud
+    #Element Should Contain    //table[contains(@id, '_shoppingcarthistory_')]//tbody/tr[${rows}]/td[4]    Teostatud
+    #Verify sidebar
+    Verify Sidebar LoggedIn
+
+Select Package
+    Click Link    Paketivahetus
+    ${old_package}=    Get Text    //div/div/h2[contains(text(),'Leping')]/../../div[@class='section-content']//dd
+    Set Test Variable    ${NewPackage}    ${PAK_1}
+    ${NewPackage}=    Set Variable If    '${old_package}' == '${PAK_2}'    ${PAK_1}    ${PAK_2}
+    Sleep    5
+    Wait Until Page Contains Element    select-packetCode    ${TIMEOUT}
+    Click Link    select-packetCode
+    Click Link    ${NewPackage}
+    Click Link    _contractssusg_WAR_dashboardportlets_packageChangePopup
+
+Verify Page Liitumine - Allkirjastamine
+    Wait Until Page Contains Element    //div[@id='_packagechange_WAR_processportlets_signingContainer']//h1    ${TIMEOUT}
+    #Check Titles
+    Element Should Contain    //div[@class='title']    Paketivahetus
+    #Check sidebar
+    Element Should Contain    //h2[@class='alt']    Kokkuvõte
+    #Check H1 title
+    Element Should Contain    //div[@id='_packagechange_WAR_processportlets_signingContainer']//h1    Allkirjastamine
+    #Check sidebar
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][1]    Mobiilinumber:\n${susgNUM1}\nPakett:\n${NewPackage}
+    Element Should Contain    //div[@class='account box']/div[@class='selection'][2]    Kuutasu kokku:
+    #Check buttons
+    Element Should Contain    //button[@id="_packagechange_WAR_processportlets_signingMethodButton"]    Jätka
+
+Fill In Page Paketivahetus - Andmed
+    Wait Until Page Contains Element    //*[@id="_packagechange_WAR_processportlets__forename"]    ${TIMEOUT}
+    Sleep    1
+    #Click Element    //*[@id="_newcontract_WAR_processportlets__forename"]
+    #Input Text    //*[@id="_newcontract_WAR_processportlets__forename"]    ${AutoEN1}    #Sometimes textfield is not filled properly. So it's done two times
+    #Input Text    //*[@id="_newcontract_WAR_processportlets__surname"]    ${AutoPN1}
+    Input Text    //*[@id="_packagechange_WAR_processportlets__email"]    autotest_eteendindus@emt.ee
+    Input Text    //*[@id="birthdate"]    20.1.1988
+    #Click Link    //a[@id="select-_newcontract_WAR_processportlets__post"]
+    #Click Link    spetsialist
+    #Click Link    //*[@id="select-_newcontract_WAR_processportlets__sector"]
+    #Click Link    turundus
+    Click Link    //*[@id="select-_packagechange_WAR_processportlets__language"]
+    Click Link    Eesti
+    Click Link    //a[@id="select-_packagechange_WAR_processportlets__gender"]
+    Click Link    Mees
+    #Select Checkbox    publishData    #//input[@id="_newcontract_WAR_processportlets_publishData"]
+    #Select Checkbox    showOnInvoice    #//input[@id="_newcontract_WAR_processportlets_showOnInvoice"]
+    #Click Element    //label[@for="_packagechange_WAR_processportlets_publishData" and @class='label-check']
+    #Click Element    //label[@for="_packagechange_WAR_processportlets_showOnInvoice" and @class='label-check']
+    #Sleep    2
+    #Click Button Jätka
+    Click Button    //button[@class='button red next']
+    Wait Until Page Contains Element    id=_packagechange_WAR_processportlets_processForm    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Paketivahetus - Paketivalik

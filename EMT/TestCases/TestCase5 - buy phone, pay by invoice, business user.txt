@@ -1,0 +1,98 @@
+*** Settings ***
+Suite Setup       Open Browser    ${homepage}    chrome    winTC5
+Test Setup        Test Case Setup
+Test Teardown     Test Case Teardown
+Test Timeout      10 minutes
+Resource          ../Resources/common_resources.txt
+Resource          ../Resources/testcase5_resources.txt
+Resource          ../Resources/eshop_resources.txt
+
+*** Test Cases ***
+TestCase5
+    [Documentation]    Test Case 5, No new user needed,
+    ...    pay bills,
+    ...    empty shopping cart
+    [Tags]    TestCase5    Ready
+    Precheck
+    # Step 1
+    Verify Start Page
+    # Step 2
+    Go To Web Shop
+    Verify Web Shop Page When Logged Out
+    # Step 3 - 5
+    Log In To Web Shop
+    # Step 6
+    Verify E-Shop Page When Logged In
+    # Step 7
+    Got To Smartphones Page
+    # Step 8
+    Select Product
+    # Step 9
+    Select Phone Without Package
+    #Step 10
+    Add Phone To Shopping Cart
+    #Step 11
+    Proceed To Shipping Options
+    #Step 12
+    Fill In Shipping Options And Place Order
+    #Step 13
+    Verify Order In Order History
+    Log Out    ${lrEN1}    ${lrPN1}
+
+*** Keywords ***
+Precheck
+    Check Subscribers Saldo    ${IK1}    ${lrEN1}    ${lrPN1}    ${MAAC1}    ${MAAC1_REF}    winTC5
+    Check Shopping Cart    ${IK1}    ${lrEN1}    ${lrPN1}    ${MAAC1}    ${MAAC1_REF}    winTC5
+
+Verify Web Shop Page When Logged Out
+    Run Keyword And Continue On Failure    Verify Page E-pood
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedOut
+
+Log In To Web Shop
+    Click Link    Sisene
+    Run Keyword And Continue On Failure    Verify Sidebar Login Window
+    Login    ${IK1}    ${lrEN1}    ${lrPN1}    ${MAAC1}    ${MAAC1_REF}
+    Check Logged In Subscription    ${susgEN1}    ${susgPN1}    ${susgNUM1}
+
+Verify E-Shop Page When Logged In
+    Run Keyword And Continue On Failure    Verify Page E-pood
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Got To Smartphones Page
+    Click Link    Nutitelefonid
+    Wait Until Page Contains Element    //h1[text()='Nutitelefonid']    ${TIMEOUT}
+    Input Text    id=_eshop_WAR_eshopportletnew_filterSearchPattern    ${COMP1} ${NAME1}
+    Click Button    id=_eshop_WAR_eshopportletnew_refreshButton
+    Sleep    3
+    Wait Until Page Contains Element    xpath=//div[@class='title']//a[@title='${COMP1} ${NAME1}']    ${TIMEOUT}
+    #Wait Until Page Contains Element    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    ${TIMEOUT}
+    Run Keyword And Continue On Failure    Verify Page Nutitelefonid
+    Run Keyword And Continue On Failure    Verify Sidebar LoggedIn
+
+Select Product
+    Click Link    xpath=//div[@class='title']//a[@title='${COMP1} ${NAME1}']    #click product link
+    #Click Link    xpath=//div[@class="products-grid clear"]//div[@class="product-view"][a[@title='${COMP1} ${NAME1}']]//a[@class='button vaata-button']    #Click Vaata button
+    Run Keyword And Continue On Failure    Verify Product Page - Detailed view    ${KOOD1}    ${COMP1}    ${NAME1}
+    Verify Sidebar LoggedIn
+
+Select Phone Without Package
+    Click Link    _eshop_WAR_eshopportletnew_productLeasingButton1
+    Run Keyword And Continue On Failure    Verify Payment Options Modal Window
+
+Add Phone To Shopping Cart
+    Click Link    //p[@class='actions']/a[@class='button']    #Click button Osta
+    Run Keyword And Continue On Failure    Verify Page Ostukorv
+
+Proceed To Shipping Options
+    Click Link    //div[@class='buttons']/a[@class='button red small']    #Click Button Jätka
+    Wait Until Page Contains Element    confirmButton    ${TIMEOUT}
+    Click Button    confirmButton    #Click button Jah
+    Run Keyword And Continue On Failure    Verify Page Ostukorv - Kohaletoimetamine
+
+Fill In Shipping Options And Place Order
+    Fill In Shipping Options
+    Run Keyword And Continue On Failure    Check That Order Was Succesfull
+
+Verify Order In Order History
+    Go To Order History
+    Verify Order History
